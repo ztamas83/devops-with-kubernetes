@@ -14,4 +14,7 @@ spec:
     spec:
       containers:
         - name: logoutput
-          image: ztamas/log-output:1.1
+          image: ztamas/log-output:1.7
+          env:
+            - name: PORT
+              value: "3000"
