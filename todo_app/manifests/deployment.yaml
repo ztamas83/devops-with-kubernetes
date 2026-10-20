@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: todo_app:1
+          image: ztamas/todo_app:1
