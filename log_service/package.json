@@ -4,7 +4,9 @@
   "description": "Generates a random UUID on startup and prints it every 5 seconds with a timestamp",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start:generate": "node index.js",
+    "start:server": "SERVER=1 node index.js"
+
   },
   "license": "UNLICENSED",
   "private": true

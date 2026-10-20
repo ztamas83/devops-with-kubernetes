@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-app-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-app
+  template:
+    metadata:
+      labels:
+        app: log-app
+    spec:
+      volumes: # Define volume
+        - name: logs-volume
+          emptyDir: {}
+      containers:
+        - name: log-generator
+          image: ztamas/log-app:1.10.2
+          volumeMounts: # Mount volume
+            - name: logs-volume
+              mountPath: /usr/src/app/files
+          env:
+            - name: PORT
+              value: "3000"
+            - name: FILE_PATH
+              value: "/usr/src/app/files/log.txt"
+        - name: log-server
+          image: ztamas/log-app:1.10.2
+          volumeMounts: # Mount volume
+            - name: logs-volume
+              mountPath: /usr/src/app/files
+          env:
+            - name: SERVER
+              value: "1"
+            - name: FILE_PATH
+              value: "/usr/src/app/files/log.txt"
+            - name: PORT
+              value: "3000"
