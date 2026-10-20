@@ -14,4 +14,8 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: ztamas/todo_app:1
+          image: ztamas/todo_app:2
+          env:
+            - name: PORT
+              value: "8800"
+            
