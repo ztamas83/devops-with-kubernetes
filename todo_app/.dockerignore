@@ -4,3 +4,4 @@ Dockerfile
 .dockerignore
 manifests
 README.md
+data

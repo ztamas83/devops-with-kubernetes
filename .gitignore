@@ -152,3 +152,4 @@ vite.config.ts.timestamp-*
 examples
 **/log.txt
 **/ping.txt
+todo_app/data

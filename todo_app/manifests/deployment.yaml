@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-app
+  name: todo-app-dep
 spec:
   replicas: 1
   selector:
@@ -12,10 +12,19 @@ spec:
       labels:
         app: todo-app
     spec:
+      volumes: # Define volume
+        - name: images-volume
+          persistentVolumeClaim:
+            claimName: images-pvc
       containers:
         - name: todo-app
-          image: ztamas/todo_app:2
+          image: ztamas/todo-app:1.12.2
+          volumeMounts:
+            - name: images-volume
+              mountPath: /usr/src/app/images
           env:
             - name: PORT
               value: "3000"
-            
+            - name: IMAGE_DIR
+              value: /usr/src/app/images
+
