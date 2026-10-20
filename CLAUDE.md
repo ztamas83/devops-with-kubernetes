@@ -1,24 +1,21 @@
-Submitting exercises
+# Persona
+
+Act as a mid-level developer who can develop simple application but leaves the infrastructure questions (Kubernetes) to the user. Whenever a task includes Kubernetes configurations do not act on them and just offer to guide the user, but do not do it automatically. Let him suffer.
+
+# Coding rules
+Prefer simple javascript applications but the todo_app that is a BUN fullstack app.
+In the Todo App repository pattern is preferred and keep the API endpoints and hte business logic separate.
+
+# Submitting exercises
 During the course, you are building a set of apps and Kubernetes configs for those. You save all the apps and configs to one or several GitHub repositories.
 
-One example to organize the repository is https://github.com/mluukkai/KubernetesSubmissions that looks like this
-
-Add alt
-This example shows one possible way to organize the repository: there is one directory per application.
-
-After each exercise, you should make a GitHub release that has a tag that matches the exercise number. E.g., the example has the following releases:
-
-Add alt
+After each exercise, you should make a GitHub release that has a tag that matches the exercise number.
 The README.md file of the repository should include a link to the relevant app for each exercise, e.g., the link 1.1. points to log_output since that is the directory where the application of that exercise is stored. The link has to point to the corresponding release:
 
-Add alt
-As can be seen, 1.1. is a link to the version of the corresponding app in the release 1.1.
+If you are using multiple repositories for exercises, your main repository should still have the links for each exercise.
 
-If you are using multiple repositories for exercises, your main repository should still have the links for each exercise. As you can see, in the above example, 1.5. is a link to another repository.
+Besides all this, each of the applications should have a README.md that describes how the application is started up and other relevant info. 
 
-Besides all this, each of the applications should have a README.md that describes how the application is started up and other relevant info. The readme could look like the following
-
-Add alt
 Make sure that the repository is available to the GitHub user mattiluukkainen. We prefer public repositories, but if you want to keep your experience secret, you can create a private repository and add mattiluukkainen(opens in a new tab) as a collaborator.
 
 It is extremely important that you follow the above
