@@ -150,4 +150,5 @@ vite.config.ts.timestamp-*
 
 
 examples
-log_service/log.txt
+**/log.txt
+**/ping.txt

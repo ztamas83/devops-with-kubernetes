@@ -12,9 +12,18 @@ spec:
       labels:
         app: pingpong
     spec:
+      volumes: # Define volume
+        - name: logs-volume
+          persistentVolumeClaim:
+            claimName: log-pvc
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:1.9
+          image: ztamas/ping-pong:1.11
           env:
             - name: PORT
               value: "3000"
+            - name: FILE_PATH
+              value: "/usr/src/app/files/ping.txt"
+          volumeMounts:
+          - name: logs-volume
+            mountPath: /usr/src/app/files

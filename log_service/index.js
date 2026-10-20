@@ -5,7 +5,9 @@ const fs = require('fs');
 const id = randomUUID();
 const INTERVAL_MS = 5000;
 const PORT = process.env.PORT || 3000;
-const LOG_PATH = process.env.FILE_PATH || "/usr/src/app/log.txt"
+const LOG_PATH = process.env.LOG_PATH || "/usr/src/app/files"
+const LOGFILE = `${LOG_PATH}/log.txt`
+const PINGFILE = `${LOG_PATH}/ping.txt`
 
 let timestamp;
 
@@ -15,18 +17,24 @@ function print() {
   console.log(data);
 
   try {
-    fs.appendFileSync(LOG_PATH, `${data}\n`);
+    fs.writeFileSync(LOGFILE, `${data}\n`);
   }
   catch (err) {
     console.error("Could not write to file", err)
   }
 }
 
-function read() {
-  return fs.readFileSync(LOG_PATH).toString();
+console.log(`Configured file path: ${LOG_PATH}`);
+
+
+function readLog() {
+  return fs.readFileSync(LOGFILE).toString();
 }
 
-console.log(`Configured file path: ${LOG_PATH}`);
+function readPing() {
+
+  return fs.existsSync(PINGFILE) ? Number.parseInt(fs.readFileSync(PINGFILE).toString()) : 0;
+}
 
 let server = undefined;
 let timer = undefined;
@@ -42,7 +50,9 @@ if (process.env.SERVER && process.env.SERVER === "1") { // log reader
     if (req.method === 'GET' && req.url === '/status') {
       res.writeHead(200, { 'Content-Type': 'text/plain' });
 
-      res.end(read());
+      const content = `${readLog()}Ping / Pongs: ${readPing()}`;
+
+      res.end(content);
       return;
     }
     res.writeHead(404, { 'Content-Type': 'text/plain' });

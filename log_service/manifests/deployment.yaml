@@ -14,27 +14,28 @@ spec:
     spec:
       volumes: # Define volume
         - name: logs-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: log-pvc
       containers:
         - name: log-generator
-          image: ztamas/log-app:1.10.2
+          image: ztamas/log-app:1.11.2
           volumeMounts: # Mount volume
             - name: logs-volume
               mountPath: /usr/src/app/files
           env:
             - name: PORT
               value: "3000"
-            - name: FILE_PATH
-              value: "/usr/src/app/files/log.txt"
+            - name: LOG_PATH
+              value: "/usr/src/app/files"
         - name: log-server
-          image: ztamas/log-app:1.10.2
+          image: ztamas/log-app:1.11.2
           volumeMounts: # Mount volume
             - name: logs-volume
               mountPath: /usr/src/app/files
           env:
             - name: SERVER
               value: "1"
-            - name: FILE_PATH
-              value: "/usr/src/app/files/log.txt"
+            - name: LOG_PATH
+              value: "/usr/src/app/files"
             - name: PORT
               value: "3000"
