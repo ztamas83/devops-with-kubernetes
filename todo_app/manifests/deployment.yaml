@@ -17,5 +17,5 @@ spec:
           image: ztamas/todo_app:2
           env:
             - name: PORT
-              value: "8800"
+              value: "3000"
             
