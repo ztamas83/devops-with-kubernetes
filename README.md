@@ -23,4 +23,4 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 
 - [2.1.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.1/log_service)
 - [2.2.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.2/todo_backend)
-
+- [2.3.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.3)
