@@ -1,2 +1,5 @@
 [tools]
 node = "24"
+
+[env]
+SOPS_AGE_KEY_FILE = "{{env.HOME}}/.config/age/key.txt"

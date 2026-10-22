@@ -17,9 +17,15 @@ spec:
         - name: logs-volume
           persistentVolumeClaim:
             claimName: log-pvc
+        - name: information
+          configMap:
+            name: log-server-cm
+            items:
+              - key: information.txt
+                path: "information.txt"
       containers:
         - name: log-generator
-          image: ztamas/log-app:2.1
+          image: ztamas/log-app:2.5.1
           volumeMounts: # Mount volume
             - name: logs-volume
               mountPath: /usr/src/app/files
@@ -29,10 +35,13 @@ spec:
             - name: LOG_PATH
               value: "/usr/src/app/files"
         - name: log-server
-          image: ztamas/log-app:2.1
+          image: ztamas/log-app:2.5.1
           volumeMounts: # Mount volume
             - name: logs-volume
               mountPath: /usr/src/app/files
+            - name: information
+              mountPath: "/app/config"
+              readOnly: true
           env:
             - name: SERVER
               value: "1"
@@ -42,3 +51,8 @@ spec:
               value: "3000"
             - name: PING_SVC_URL
               value: "http://pingpong-svc:2002"
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  key: MESSAGE
+                  name: log-server-cm

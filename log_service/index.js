@@ -25,8 +25,8 @@ async function print() {
 console.log(`Configured file path: ${LOG_PATH}`);
 
 
-function readLog() {
-  return Bun.file(LOGFILE).text();
+async function readLog() {
+  return await Bun.file(LOGFILE).text();
 }
 
 async function readPing() {
@@ -72,7 +72,11 @@ if (process.env.SERVER && process.env.SERVER === "1") { // log reader
       "/status": {
         GET: withLogging(async () => {
           try {
-            const content = `${await readLog()}Ping / Pongs: ${await readPing()}`;
+            const fileContent = await Bun.file("./config/information.txt").text();
+            const envContent = process.env.MESSAGE;
+            const log = await readLog();
+            const ping = await readPing();
+            const content = `file content: ${fileContent}\nenv variable: ${envContent}\n${log}Ping / Pongs: ${ping}`;
             return new Response(content, { headers: { 'Content-Type': 'text/plain' } });
           } catch (err) {
             console.error(err.message);
