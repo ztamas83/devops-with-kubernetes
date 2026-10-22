@@ -13,18 +13,24 @@ spec:
       labels:
         app: pingpong
     spec:
-      volumes: # Define volume
-        - name: logs-volume
-          persistentVolumeClaim:
-            claimName: log-pvc
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:2.1
+          image: ztamas/ping-pong:2.7
           env:
             - name: PORT
               value: "3000"
-            - name: FILE_PATH
-              value: "/usr/src/app/files/ping.txt"
-          volumeMounts:
-          - name: logs-volume
-            mountPath: /usr/src/app/files
+            - name: POSTGRES_HOST
+              value: "postgres-svc.default"
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: infra-config
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres
+

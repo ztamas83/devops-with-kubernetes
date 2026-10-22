@@ -1,11 +1,14 @@
 {
   "name": "ping-pong",
   "version": "1.0.0",
-  "description": "Responds with pong <count> to GET /pingpong and increments a counter stored in a file",
+  "description": "Responds with pong <count> to GET /pingpong and increments a counter stored in Postgres",
   "main": "index.js",
   "scripts": {
-    "start": "FILE_PATH=../log_service/ping.txt node index.js"
+    "start": "POSTGRES_HOST=localhost POSTGRES_DB=${POSTGRES_DB:-postgres} POSTGRES_USER=${POSTGRES_USER:-postgres} POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres} node index.js"
   },
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "postgres": "3.4.9"
+  }
 }

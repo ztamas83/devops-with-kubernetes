@@ -27,4 +27,5 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 - [2.4.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.4)
 - [2.5.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.5/log_service)
 - [2.6.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.6/todo_app)
+- [2.7.](https://github.com/ztamas83/devops-with-kubernetes/tree/2.7/ping_pong)
 
