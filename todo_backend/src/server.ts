@@ -1,14 +1,19 @@
 import { logged, withLogging } from "./api/requestLogger";
 import { todoRoutes } from "./api/todoRoutes";
-import { createInMemoryTodoRepository } from "./repositories/todoRepository";
+import { createPostgresTodoRepository } from "./repositories/todoRepository";
 import { createTodoService } from "./services/todoService";
 import { config } from "./config";
+import { sql, waitForDatabase } from "./db";
 
-const todoService = createTodoService(createInMemoryTodoRepository());
+await waitForDatabase();
+const todoService = createTodoService(await createPostgresTodoRepository(sql));
 
 function shutdown(signal: string) {
   console.log(`Received ${signal}, shutting down`);
-  server.stop().then(() => process.exit(0));
+  server
+    .stop()
+    .then(() => sql.close())
+    .then(() => process.exit(0));
 }
 
 const server = Bun.serve({

@@ -15,10 +15,24 @@ spec:
     spec:
       containers:
         - name: todo-backend
-          image: ztamas/todo-backend:2.6
+          image: ztamas/todo-backend:2.8
           env:
             - name: PORT
               value: "3000"
+            - name: POSTGRES_HOST
+              value: "postgres-svc.default"
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: infra-config
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres
           ports:
             - name: http
               containerPort: 3000
