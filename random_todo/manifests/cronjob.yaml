@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: random-todo-job
+spec:
+  schedule: "0 */1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: random-todo
+            image: ztamas/random-todo:2.9.1
+            env:
+              - name: TODO_BACKEND_URL
+                value: todo-backend-svc:2101
+          restartPolicy: Never
