@@ -1,12 +1,11 @@
 {
-  "name": "app1",
-  "version": "1.0.0",
+  "name": "log_service",
+  "version": "2.0.0",
   "description": "Generates a random UUID on startup and prints it every 5 seconds with a timestamp",
   "main": "index.js",
   "scripts": {
-    "start:generate": "LOG_PATH=. node index.js",
-    "start:server": "LOG_PATH=. SERVER=1 node index.js"
-
+    "start:generate": "LOG_PATH=. bun index.js",
+    "start:server": "LOG_PATH=. SERVER=1 PORT=3001 PING_SVC_URL=http://localhost:3000 bun index.js"
   },
   "license": "UNLICENSED",
   "private": true

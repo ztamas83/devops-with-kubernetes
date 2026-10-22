@@ -1,10 +1,10 @@
-FROM node:24-alpine
+FROM oven/bun:1.4-alpine
 
 WORKDIR /app
 
 COPY package.json ./
 COPY index.js ./
 
-USER node
+USER bun
 
-CMD ["node", "index.js"]
+CMD ["bun", "index.js"]

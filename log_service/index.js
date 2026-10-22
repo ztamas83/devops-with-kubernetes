@@ -1,23 +1,21 @@
 const { randomUUID } = require('crypto');
-const http = require('http');
-const fs = require('fs');
 
 const id = randomUUID();
 const INTERVAL_MS = 5000;
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const LOG_PATH = process.env.LOG_PATH || "/usr/src/app/files"
 const LOGFILE = `${LOG_PATH}/log.txt`
-const PINGFILE = `${LOG_PATH}/ping.txt`
+const PING_SVC_URL = process.env.PING_SVC_URL || "http://localhost:3000"
 
 let timestamp;
 
-function print() {
+async function print() {
   timestamp = new Date().toISOString();
   const data = `${timestamp} ${id}`;
   console.log(data);
 
   try {
-    fs.writeFileSync(LOGFILE, `${data}\n`);
+    await Bun.write(LOGFILE, `${data}\n`);
   }
   catch (err) {
     console.error("Could not write to file", err)
@@ -28,12 +26,33 @@ console.log(`Configured file path: ${LOG_PATH}`);
 
 
 function readLog() {
-  return fs.readFileSync(LOGFILE).toString();
+  return Bun.file(LOGFILE).text();
 }
 
-function readPing() {
+async function readPing() {
+  const res = await fetch(`${PING_SVC_URL}/pings`);
+  if (!res.ok) {
+    throw new Error(`Ping fetch failed: ${res.status} ${res.statusText}`);
+  }
+  return Number.parseInt(await res.text());
+}
 
-  return fs.existsSync(PINGFILE) ? Number.parseInt(fs.readFileSync(PINGFILE).toString()) : 0;
+// Middleware: logs each request and its response status with the handling time
+function withLogging(handler) {
+  return async (req, server) => {
+    const start = performance.now();
+    const { pathname } = new URL(req.url);
+    console.log(`--> ${req.method} ${pathname}`);
+
+    try {
+      const res = await handler(req, server);
+      console.log(`<-- ${req.method} ${pathname} ${res.status} ${Math.round(performance.now() - start)}ms`);
+      return res;
+    } catch (err) {
+      console.log(`<-- ${req.method} ${pathname} 500 ${Math.round(performance.now() - start)}ms`);
+      throw err;
+    }
+  };
 }
 
 let server = undefined;
@@ -42,33 +61,36 @@ let timer = undefined;
 function shutdown(signal) {
     console.log(`Received ${signal}, shutting down`);
     clearInterval(timer);
-    server?.close(() => process.exit(0));
+    if (!server) process.exit(0);
+    server.stop().then(() => process.exit(0));
 }
 
 if (process.env.SERVER && process.env.SERVER === "1") { // log reader
-  server = http.createServer((req, res) => {
-    if (req.method === 'GET' && req.url === '/status') {
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-
-      const content = `${readLog()}Ping / Pongs: ${readPing()}`;
-
-      res.end(content);
-      return;
-    }
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not found');
+  server = Bun.serve({
+    port: PORT,
+    routes: {
+      "/status": {
+        GET: withLogging(async () => {
+          try {
+            const content = `${await readLog()}Ping / Pongs: ${await readPing()}`;
+            return new Response(content, { headers: { 'Content-Type': 'text/plain' } });
+          } catch (err) {
+            console.error(err.message);
+            return new Response('Status unavailable', { status: 502 });
+          }
+        }),
+      },
+    },
+    fetch: withLogging(() => new Response('Not found', { status: 404 })),
   });
 
-  server?.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
-  });
-
-  process.on('SIGTERM', () => shutdown('SIGTERM'));
-  process.on('SIGINT', () => shutdown('SIGINT'));
+  console.log(`Server started on port ${server.port}`);
+  console.log(`Reading pings from ${PING_SVC_URL}`);
 }
 else { // log generator
   print();
   timer = setInterval(print, INTERVAL_MS);
 }
 
-
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

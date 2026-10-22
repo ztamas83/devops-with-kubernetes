@@ -18,7 +18,7 @@ spec:
             claimName: log-pvc
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:1.11
+          image: ztamas/ping-pong:2.1
           env:
             - name: PORT
               value: "3000"
