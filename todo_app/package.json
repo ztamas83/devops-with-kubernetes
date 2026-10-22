@@ -5,9 +5,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "TODO_BACKEND_URL=localhost:3001 bun --hot src/server.ts",
+    "dev": "bun --hot src/server.ts",
     "build": "bun build src/server.ts --target=bun --production --outdir=dist",
-    "start": "cd dist && NODE_ENV=production bun server.js"
+    "start": "cd dist && NODE_ENV=production bun --env-file=../.env server.js"
   },
   "dependencies": {
     "react": "^19.3.1",

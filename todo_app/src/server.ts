@@ -2,22 +2,17 @@ import index from "./client/index.html";
 import { imageRoutes } from "./server/api/imageRoutes";
 import { createDiskImageRepository } from "./server/repositories/imageRepository";
 import { createImageService } from "./server/services/imageService";
+import { config } from "./config";
 
-const PORT = Number(process.env.PORT) || 3000;
-const IMAGE_DIR = process.env.IMAGE_DIR || "./data/images";
-const IMAGE_MAX_AGE_MS = 10 * 60 * 1000;
-// Only for local development, in the cluster the Ingress routes /todos to todo-backend
-const TODO_BACKEND_URL = process.env.TODO_BACKEND_URL;
-
-const imageService = createImageService(createDiskImageRepository(IMAGE_DIR), {
-  sourceUrl: "https://picsum.photos/600",
-  maxAgeMs: IMAGE_MAX_AGE_MS,
+const imageService = createImageService(createDiskImageRepository(config.imageDir), {
+  sourceUrl: config.imageSourceUrl,
+  maxAgeMs: config.imageMaxAgeMs,
 });
 
 function proxyToTodoBackend(req: Request) {
-  if (!TODO_BACKEND_URL) return new Response("Not found", { status: 404 });
+  if (!config.todoBackendUrl) return new Response("Not found", { status: 404 });
   const { pathname, search } = new URL(req.url);
-  return fetch(`${TODO_BACKEND_URL}${pathname}${search}`, {
+  return fetch(`${config.todoBackendUrl}${pathname}${search}`, {
     method: req.method,
     headers: req.headers,
     body: req.body,
@@ -30,7 +25,7 @@ function shutdown(signal: string) {
 }
 
 const server = Bun.serve({
-  port: PORT,
+  port: config.port,
   routes: {
     "/": index,
     "/crash": () => { process.abort() },
@@ -41,8 +36,8 @@ const server = Bun.serve({
 });
 
 console.log(`Server started on port ${server.port}`);
-console.log(`Caching images in ${IMAGE_DIR}`);
-if (TODO_BACKEND_URL) console.log(`Proxying /todos to ${TODO_BACKEND_URL}`);
+console.log(`Caching images in ${config.imageDir}`);
+if (config.todoBackendUrl) console.log(`Proxying /todos to ${config.todoBackendUrl}`);
 
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));

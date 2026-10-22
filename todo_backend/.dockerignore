@@ -4,3 +4,5 @@ Dockerfile
 .dockerignore
 manifests
 README.md
+.env
+.env.*

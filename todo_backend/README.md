@@ -25,13 +25,23 @@ Code layout (`src`):
 
 ## Configuration
 
-| Variable | Default | Description |
-| -------- | ------- | ----------- |
-| `PORT`   | `3001`  | Port the server listens on |
+All configuration comes from environment variables. There are no defaults in the code: the server exits on startup if a required variable is missing.
+
+| Variable | Required | Description |
+| -------- | -------- | ----------- |
+| `PORT`   | yes | Port the server listens on |
+
+In the cluster `PORT` is set in [manifests/deployment.yaml](manifests/deployment.yaml).
 
 ## Run locally
 
 Requires [Bun](https://bun.sh) 1.4+.
+
+Copy the example configuration (`PORT=3001`). Bun loads `.env` automatically.
+
+```bash
+cp .env.example .env
+```
 
 ```bash
 bun install

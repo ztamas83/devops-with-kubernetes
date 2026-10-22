@@ -10,4 +10,5 @@ spec:
   ports:
     - port: 2100 # This is the port that is available outside. Value for nodePort can be between 30000-32767
       protocol: TCP
-      targetPort: 3000 # This is the target port
+      targetPort: http # This is the target port
+      name: http

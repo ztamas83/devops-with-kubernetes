@@ -13,4 +13,4 @@ spec:
           service:
             name: todo-app-svc
             port:
-              number: 2100
+              name: http

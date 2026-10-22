@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun --hot src/server.ts",
     "build": "bun build src/server.ts --target=bun --production --outdir=dist",
-    "start": "NODE_ENV=production bun dist/server.js"
+    "start": "NODE_ENV=production bun --env-file=.env dist/server.js"
   },
   "devDependencies": {
     "@types/bun": "^1.4.3",

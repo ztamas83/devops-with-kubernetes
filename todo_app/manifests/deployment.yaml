@@ -19,13 +19,17 @@ spec:
             claimName: images-pvc
       containers:
         - name: todo-app
-          image: ztamas/todo-app:2.2
+          image: ztamas/todo-app:2.6
           volumeMounts:
             - name: images-volume
               mountPath: /usr/src/app/images
+          envFrom:
+            - configMapRef:
+                name: todo-app-cm
           env:
             - name: PORT
               value: "3000"
-            - name: IMAGE_DIR
-              value: /usr/src/app/images
+          ports:
+            - name: http
+              containerPort: 3000
 
