@@ -18,7 +18,7 @@ spec:
             claimName: images-pvc
       containers:
         - name: todo-app
-          image: ztamas/todo-app:1.13.1
+          image: ztamas/todo-app:2.2
           volumeMounts:
             - name: images-volume
               mountPath: /usr/src/app/images

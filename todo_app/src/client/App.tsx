@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 const MAX_TODO_LENGTH = 140;
 
@@ -12,11 +12,30 @@ export function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
 
   useEffect(() => {
-    fetch("/api/todos")
+    fetch("/todos")
       .then((res) => res.json())
       .then(setTodos)
       .catch((err) => console.error("Failed to load todos", err));
   }, []);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!text.trim()) return;
+
+    try {
+      const res = await fetch("/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const todo: Todo = await res.json();
+      setTodos((prev) => [...prev, todo]);
+      setText("");
+    } catch (err) {
+      console.error("Failed to create todo", err);
+    }
+  }
 
   return (
     <main className="page">
@@ -24,7 +43,7 @@ export function App() {
         Todo <em>app</em>
       </h1>
       <img className="page-image" src="/api/image" alt="Random image" width={300} height={300} />
-      <div className="todo-form">
+      <form className="todo-form" onSubmit={handleSubmit}>
         <input
           className="text-input"
           type="text"
@@ -34,9 +53,8 @@ export function App() {
           aria-label="New todo"
           onChange={(e) => setText(e.target.value)}
         />
-        {/* Placeholder, submitting is not implemented yet */}
-        <button className="btn" type="button">Send</button>
-      </div>
+        <button className="btn" type="submit">Send</button>
+      </form>
       <section className="todo-section">
         <h2 className="headline web-subtitle">Todos</h2>
         <ul className="todo-list">
