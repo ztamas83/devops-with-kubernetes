@@ -4,7 +4,9 @@ Bun server that serves a React SPA on `GET /`. Prints `Server started in port NN
 
 The client lives in `src/client` and is bundled by Bun through the HTML import in `src/server.ts`.
 
-The page shows the title and a random image served from `GET /api/image`. The image comes from https://picsum.photos/600 and is cached on disk in `IMAGE_DIR`. A cached image younger than 10 minutes is served as is; otherwise a new one is fetched, stored and served. If the fetch fails, the stale cached image is served.
+The page shows the title, a random image (300x300) served from `GET /api/image`, an input field (max 140 characters) with a placeholder "Send" button, and the list of todos from `GET /api/todos`. Todos currently come from a hardcoded in-memory repository.
+
+The image comes from https://picsum.photos/600 and is cached on disk in `IMAGE_DIR`. A cached image younger than 10 minutes is served as is; otherwise a new one is fetched, stored and served. If the fetch fails, the stale cached image is served.
 
 ## Endpoints
 
@@ -12,13 +14,14 @@ The page shows the title and a random image served from `GET /api/image`. The im
 | ------ | ---- | ----------- |
 | `GET` | `/` | Todo app SPA |
 | `GET` | `/api/image` | Random image (JPEG), cached on disk for 10 minutes |
+| `GET` | `/api/todos` | List of todos (JSON) |
 | any | `/crash` | Aborts the process immediately (`process.abort()`). For testing container restarts and that the cached image survives them |
 
 Server code layout (`src/server`):
 
 - `api/`: HTTP route handlers
 - `services/`: business logic (cache expiry, refresh)
-- `repositories/`: disk storage
+- `repositories/`: storage (image on disk, todos hardcoded in memory)
 
 ## Configuration
 

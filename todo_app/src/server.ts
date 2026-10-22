@@ -2,6 +2,9 @@ import index from "./client/index.html";
 import { imageRoutes } from "./server/api/imageRoutes";
 import { createDiskImageRepository } from "./server/repositories/imageRepository";
 import { createImageService } from "./server/services/imageService";
+import { todoRoutes } from "./server/api/todoRoutes";
+import { createHardcodedTodoRepository } from "./server/repositories/todoRepository";
+import { createTodoService } from "./server/services/todoService";
 
 const PORT = Number(process.env.PORT) || 3000;
 const IMAGE_DIR = process.env.IMAGE_DIR || "./data/images";
@@ -11,6 +14,8 @@ const imageService = createImageService(createDiskImageRepository(IMAGE_DIR), {
   sourceUrl: "https://picsum.photos/600",
   maxAgeMs: IMAGE_MAX_AGE_MS,
 });
+
+const todoService = createTodoService(createHardcodedTodoRepository());
 
 
 function shutdown(signal: string) {
@@ -24,6 +29,7 @@ const server = Bun.serve({
     "/": index,
     "/crash": () => { process.abort() },
     ...imageRoutes(imageService),
+    ...todoRoutes(todoService),
   },
   development: process.env.NODE_ENV !== "production",
 });

@@ -1,0 +1,155 @@
+/* Design tokens and component styles */
+:root {
+  --cream: #f9f5e3;
+  --cream-2: #f3ecd2;
+  --navy: #1b2545;
+  --ink: #14162b;
+  --yellow: #fad132;
+  --yellow-2: #ffdc4a;
+  --bg: var(--cream);
+  --surface: var(--cream-2);
+  --text: var(--navy);
+  --text-muted: rgba(20, 22, 43, 0.62);
+  --key-phrase: rgba(20, 22, 43, 0.62);
+  --rule: rgba(20, 22, 43, 0.18);
+  --accent: var(--yellow);
+  --accent-hover: var(--yellow-2);
+  --on-accent: var(--navy);
+  --focus-ring: var(--navy);
+  --space-xs: 0.6rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --r-md: 10px;
+  --r-lg: 18px;
+  --r-pill: 999px;
+  --font-display: "Raleway", "Inter", system-ui, sans-serif;
+  --font-body: "Lato", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 3px; }
+
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-l);
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-s);
+  text-align: center;
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  margin: 0;
+}
+.headline em { font-style: italic; font-weight: 300; color: var(--key-phrase); }
+.web-title { font-size: clamp(1.8rem, 3.8vw, 3.25rem); }
+.web-subtitle { font-size: clamp(1.3rem, 2.4vw, 1.9rem); }
+
+.page-image {
+  display: block;
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--r-lg);
+}
+
+.todo-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.text-input {
+  flex: 1 1 16rem;
+  max-width: 24rem;
+  padding: 0.95rem 1.4rem;
+  border: 1.5px solid var(--rule);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.text-input::placeholder { color: var(--text-muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.95rem 1.4rem;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.3, 1), background 0.25s, box-shadow 0.25s;
+}
+.btn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -12px rgba(20, 22, 43, 0.45);
+}
+
+.todo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-m);
+  width: 100%;
+}
+
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+.todo-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-m) var(--space-l);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+/* Yellow marker along the left edge */
+.todo-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 6px;
+  background: var(--accent);
+}
