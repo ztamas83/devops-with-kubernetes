@@ -78,7 +78,13 @@ function withLogging(handler) {
 
 const server = http.createServer(
   withLogging(async (req, res) => {
-    if (req.method === "GET" && req.url === "/") {
+    if (req.method === "GET" && (req.url === "/")) {
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end(`Healthy`);
+      return;
+    }
+
+    if (req.method === "GET" && (req.url === "/pingpong")) {
       const count = await ping();
       res.writeHead(200, { "Content-Type": "text/plain" });
       res.end(`pong ${count}`);

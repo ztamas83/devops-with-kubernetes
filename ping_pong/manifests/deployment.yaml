@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:3.2
+          image: ztamas/ping-pong:3.2.1
           env:
             - name: PORT
               value: "3000"

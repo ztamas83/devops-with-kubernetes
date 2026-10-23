@@ -13,6 +13,8 @@ spec:
       labels:
         app: log-app
     spec:
+      securityContext:
+        fsGroup: 1000
       volumes: # Define volume
         - name: logs-volume
           persistentVolumeClaim:
@@ -25,7 +27,7 @@ spec:
                 path: "information.txt"
       containers:
         - name: log-generator
-          image: ztamas/log-app:2.5.1
+          image: ztamas/log-app:3.2.2
           volumeMounts: # Mount volume
             - name: logs-volume
               mountPath: /usr/src/app/files
@@ -35,7 +37,7 @@ spec:
             - name: LOG_PATH
               value: "/usr/src/app/files"
         - name: log-server
-          image: ztamas/log-app:2.5.1
+          image: ztamas/log-app:3.2.2
           volumeMounts: # Mount volume
             - name: logs-volume
               mountPath: /usr/src/app/files
@@ -50,7 +52,7 @@ spec:
             - name: PORT
               value: "3000"
             - name: PING_SVC_URL
-              value: "http://pingpong-svc:2002"
+              value: "http://pingpong-svc"
             - name: MESSAGE
               valueFrom:
                 configMapKeyRef:

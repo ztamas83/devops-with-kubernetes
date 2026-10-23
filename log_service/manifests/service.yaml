@@ -4,10 +4,10 @@ metadata:
   name: logoutput-svc
   namespace: exercises
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: log-app
   ports:
-    - port: 2001
+    - port: 80
       protocol: TCP
       targetPort: 3000

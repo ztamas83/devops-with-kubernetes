@@ -2,6 +2,7 @@ const { randomUUID } = require("crypto");
 
 const id = randomUUID();
 const INTERVAL_MS = 5000;
+const PING_TIMEOUT_MS = 1000;
 const PORT = Number(process.env.PORT) || 3000;
 const LOG_PATH = process.env.LOG_PATH || "/usr/src/app/files";
 const LOGFILE = `${LOG_PATH}/log.txt`;
@@ -24,11 +25,13 @@ async function print() {
 console.log(`Configured file path: ${LOG_PATH}`);
 
 async function readLog() {
-  return await Bun.file(LOGFILE).text();
+  return await Bun.file(LOGFILE, () => console.error("Could not read file")).text();
 }
 
 async function readPing() {
-  const res = await fetch(`${PING_SVC_URL}/pings`);
+  const res = await fetch(`${PING_SVC_URL}/pings`, {
+    signal: AbortSignal.timeout(PING_TIMEOUT_MS),
+  });
   if (!res.ok) {
     throw new Error(`Ping fetch failed: ${res.status} ${res.statusText}`);
   }
@@ -73,6 +76,9 @@ if (process.env.SERVER && process.env.SERVER === "1") {
     port: PORT,
     routes: {
       "/": {
+        GET: () => new Response("Healthy", { status: 200 })
+      },
+      "/status": {
         GET: withLogging(async () => {
           try {
             const fileContent = await Bun.file(
