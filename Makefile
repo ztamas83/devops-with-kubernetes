@@ -16,12 +16,32 @@ APPS := todo-app todo-backend ping-pong log-app
 # Second command line goal is the version, unless given as VERSION=...
 VERSION ?= $(word 2,$(MAKECMDGOALS))
 
-.PHONY: help todo $(APPS)
+# Kubernetes manifests. Encrypted secrets are decrypted with sops at deploy time,
+# the plain secrets.yaml is a local decrypted copy and is never applied.
+# Postgres runs in INFRA_NAMESPACE; its config and secret are also copied to
+# EXERCISE_NAMESPACE because pods can only reference them from their own namespace.
+INFRA_SECRETS      := infra/secrets.enc.yaml
+INFRA_CONFIG       := infra/infra-config.yaml
+INFRA_MANIFESTS    := $(filter-out %.enc.yaml infra/secrets.yaml $(INFRA_CONFIG),$(wildcard infra/*.yaml))
+EXERCISE_DIR       := infra/exercise
+EXERCISE_MANIFESTS := $(filter-out $(EXERCISE_DIR)/logs-pvc.yaml,$(wildcard $(EXERCISE_DIR)/*.yaml))
+PING_PONG_DIR      := $(DIR_ping-pong)/manifests
+INFRA_NAMESPACE    := default
+EXERCISE_NAMESPACE := exercises
+
+# $(call apply-shared,<namespace>) applies the config and secret to a namespace
+define apply-shared
+sops --decrypt $(INFRA_SECRETS) | kubectl -n $(1) apply -f -
+kubectl -n $(1) apply -f $(INFRA_CONFIG)
+endef
+
+.PHONY: help todo namespace exercise-deploy infra-deploy $(APPS)
 
 help:
 	@echo "Usage: make <app> <version>"
 	@echo "Apps: $(APPS)"
 	@echo "Groups: todo (todo-app todo-backend)"
+	@echo "Deploy: exercise-deploy (infra + $(EXERCISE_DIR) + ping-pong, postgres in $(INFRA_NAMESPACE), rest in $(EXERCISE_NAMESPACE))"
 
 $(APPS):
 	@test -n "$(VERSION)" || { echo "Missing version, e.g. make $@ 1.13"; exit 1; }
@@ -30,6 +50,18 @@ $(APPS):
 
 # group -> apps built together with the same version
 todo: todo-app todo-backend
+
+namespace:
+	kubectl create namespace $(EXERCISE_NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
+
+infra-deploy:
+	$(call apply-shared,$(INFRA_NAMESPACE))
+	kubectl -n $(INFRA_NAMESPACE) apply $(addprefix -f ,$(INFRA_MANIFESTS))
+
+exercise-deploy: infra-deploy namespace
+	$(call apply-shared,$(EXERCISE_NAMESPACE))
+	$(if $(EXERCISE_MANIFESTS),kubectl -n $(EXERCISE_NAMESPACE) apply $(addprefix -f ,$(EXERCISE_MANIFESTS)))
+	kubectl -n $(EXERCISE_NAMESPACE) apply -f $(PING_PONG_DIR)
 
 # Turn the version goal into a no-op so make does not try to build it
 ifneq ($(word 2,$(MAKECMDGOALS)),)

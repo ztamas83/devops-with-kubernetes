@@ -57,20 +57,22 @@ docker build -t ztamas/ping-pong:2.7 .
 docker push ztamas/ping-pong:2.7
 ```
 
-## Deploy to k3d
+## Deploy to GKE
 
 The Postgres StatefulSet, its ConfigMap and Secret are in [infra](../infra). The deployment reads `POSTGRES_USER` from the `infra-config` ConfigMap and `POSTGRES_PASSWORD` from the `infra-secrets` Secret.
 
+From the repository root, with `kubectl` pointing at the GKE cluster and the sops age key available:
+
 ```bash
-kubectl apply -f manifests/
+make exercise-deploy
 ```
 
-The app is exposed through the shared ingress in `infra/ingress.yaml`:
+This deploys Postgres to the `default` namespace, and the ConfigMap, Secret and ping-pong manifests to the `exercises` namespace. The app is exposed through a `LoadBalancer` service:
 
 ```bash
-kubectl apply -f ../infra/ingress.yaml
+kubectl -n exercises get svc pingpong-svc
 ```
 
 ```bash
-curl localhost:8081/pingpong
+curl http://<EXTERNAL-IP>/pingpong
 ```
