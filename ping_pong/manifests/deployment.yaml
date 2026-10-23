@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:2.7
+          image: ztamas/ping-pong:3.2
           env:
             - name: PORT
               value: "3000"
@@ -33,4 +33,3 @@ spec:
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               value: postgres
-

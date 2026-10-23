@@ -1,11 +1,11 @@
-const { randomUUID } = require('crypto');
+const { randomUUID } = require("crypto");
 
 const id = randomUUID();
 const INTERVAL_MS = 5000;
 const PORT = Number(process.env.PORT) || 3000;
-const LOG_PATH = process.env.LOG_PATH || "/usr/src/app/files"
-const LOGFILE = `${LOG_PATH}/log.txt`
-const PING_SVC_URL = process.env.PING_SVC_URL || "http://localhost:3000"
+const LOG_PATH = process.env.LOG_PATH || "/usr/src/app/files";
+const LOGFILE = `${LOG_PATH}/log.txt`;
+const PING_SVC_URL = process.env.PING_SVC_URL || "http://localhost:3000";
 
 let timestamp;
 
@@ -16,14 +16,12 @@ async function print() {
 
   try {
     await Bun.write(LOGFILE, `${data}\n`);
-  }
-  catch (err) {
-    console.error("Could not write to file", err)
+  } catch (err) {
+    console.error("Could not write to file", err);
   }
 }
 
 console.log(`Configured file path: ${LOG_PATH}`);
-
 
 async function readLog() {
   return await Bun.file(LOGFILE).text();
@@ -46,10 +44,14 @@ function withLogging(handler) {
 
     try {
       const res = await handler(req, server);
-      console.log(`<-- ${req.method} ${pathname} ${res.status} ${Math.round(performance.now() - start)}ms`);
+      console.log(
+        `<-- ${req.method} ${pathname} ${res.status} ${Math.round(performance.now() - start)}ms`,
+      );
       return res;
     } catch (err) {
-      console.log(`<-- ${req.method} ${pathname} 500 ${Math.round(performance.now() - start)}ms`);
+      console.log(
+        `<-- ${req.method} ${pathname} 500 ${Math.round(performance.now() - start)}ms`,
+      );
       throw err;
     }
   };
@@ -59,42 +61,47 @@ let server = undefined;
 let timer = undefined;
 
 function shutdown(signal) {
-    console.log(`Received ${signal}, shutting down`);
-    clearInterval(timer);
-    if (!server) process.exit(0);
-    server.stop().then(() => process.exit(0));
+  console.log(`Received ${signal}, shutting down`);
+  clearInterval(timer);
+  if (!server) process.exit(0);
+  server.stop().then(() => process.exit(0));
 }
 
-if (process.env.SERVER && process.env.SERVER === "1") { // log reader
+if (process.env.SERVER && process.env.SERVER === "1") {
+  // log reader
   server = Bun.serve({
     port: PORT,
     routes: {
-      "/status": {
+      "/": {
         GET: withLogging(async () => {
           try {
-            const fileContent = await Bun.file("./config/information.txt").text();
+            const fileContent = await Bun.file(
+              "./config/information.txt",
+            ).text();
             const envContent = process.env.MESSAGE;
             const log = await readLog();
             const ping = await readPing();
             const content = `file content: ${fileContent}\nenv variable: ${envContent}\n${log}Ping / Pongs: ${ping}`;
-            return new Response(content, { headers: { 'Content-Type': 'text/plain' } });
+            return new Response(content, {
+              headers: { "Content-Type": "text/plain" },
+            });
           } catch (err) {
             console.error(err.message);
-            return new Response('Status unavailable', { status: 502 });
+            return new Response("Status unavailable", { status: 502 });
           }
         }),
       },
     },
-    fetch: withLogging(() => new Response('Not found', { status: 404 })),
+    fetch: withLogging(() => new Response("Not found", { status: 404 })),
   });
 
   console.log(`Server started on port ${server.port}`);
   console.log(`Reading pings from ${PING_SVC_URL}`);
-}
-else { // log generator
+} else {
+  // log generator
   print();
   timer = setInterval(print, INTERVAL_MS);
 }
 
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

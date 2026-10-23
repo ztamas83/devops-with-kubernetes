@@ -26,6 +26,7 @@ INFRA_MANIFESTS    := $(filter-out %.enc.yaml infra/secrets.yaml $(INFRA_CONFIG)
 EXERCISE_DIR       := infra/exercise
 EXERCISE_MANIFESTS := $(filter-out $(EXERCISE_DIR)/logs-pvc.yaml,$(wildcard $(EXERCISE_DIR)/*.yaml))
 PING_PONG_DIR      := $(DIR_ping-pong)/manifests
+LOG_APP_DIR        := $(DIR_log-app)/manifests
 INFRA_NAMESPACE    := default
 EXERCISE_NAMESPACE := exercises
 
@@ -41,7 +42,7 @@ help:
 	@echo "Usage: make <app> <version>"
 	@echo "Apps: $(APPS)"
 	@echo "Groups: todo (todo-app todo-backend)"
-	@echo "Deploy: exercise-deploy (infra + $(EXERCISE_DIR) + ping-pong, postgres in $(INFRA_NAMESPACE), rest in $(EXERCISE_NAMESPACE))"
+	@echo "Deploy: exercise-deploy (infra + $(EXERCISE_DIR) + ping-pong + log-app, postgres in $(INFRA_NAMESPACE), rest in $(EXERCISE_NAMESPACE))"
 
 $(APPS):
 	@test -n "$(VERSION)" || { echo "Missing version, e.g. make $@ 1.13"; exit 1; }
@@ -62,6 +63,7 @@ exercise-deploy: infra-deploy namespace
 	$(call apply-shared,$(EXERCISE_NAMESPACE))
 	$(if $(EXERCISE_MANIFESTS),kubectl -n $(EXERCISE_NAMESPACE) apply $(addprefix -f ,$(EXERCISE_MANIFESTS)))
 	kubectl -n $(EXERCISE_NAMESPACE) apply -f $(PING_PONG_DIR)
+	kubectl -n $(EXERCISE_NAMESPACE) apply -f $(LOG_APP_DIR)
 
 # Turn the version goal into a no-op so make does not try to build it
 ifneq ($(word 2,$(MAKECMDGOALS)),)

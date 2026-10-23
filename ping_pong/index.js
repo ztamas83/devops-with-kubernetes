@@ -1,16 +1,18 @@
-const http = require('http');
-const postgres = require('postgres');
+const http = require("http");
+const postgres = require("postgres");
 const PORT = process.env.PORT || 3000;
 
-const REQUIRED_ENV = ['POSTGRES_DB', 'POSTGRES_USER', 'POSTGRES_PASSWORD'];
+const REQUIRED_ENV = ["POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD"];
 const missingEnv = REQUIRED_ENV.filter((name) => !process.env[name]);
 if (missingEnv.length > 0) {
-  console.error(`Missing required environment variables: ${missingEnv.join(', ')}`);
+  console.error(
+    `Missing required environment variables: ${missingEnv.join(", ")}`,
+  );
   process.exit(1);
 }
 
 const sql = postgres({
-  host: process.env.POSTGRES_HOST || 'postgres-svc.default',
+  host: process.env.POSTGRES_HOST || "postgres-svc.default",
   port: Number(process.env.POSTGRES_PORT || 5432),
   database: process.env.POSTGRES_DB,
   username: process.env.POSTGRES_USER,
@@ -30,7 +32,9 @@ async function initDb(retries = 10, delayMs = 3000) {
       return;
     } catch (err) {
       if (attempt >= retries) throw err;
-      console.log(`Database not ready (${err.message}), retrying in ${delayMs}ms (${attempt}/${retries})`);
+      console.log(
+        `Database not ready (${err.message}), retrying in ${delayMs}ms (${attempt}/${retries})`,
+      );
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
   }
@@ -54,39 +58,44 @@ async function ping() {
 function withLogging(handler) {
   return (req, res) => {
     const start = performance.now();
-    const { pathname } = new URL(req.url, 'http://localhost');
+    const { pathname } = new URL(req.url, "http://localhost");
     console.log(`--> ${req.method} ${pathname}`);
 
-    res.on('finish', () => {
-      console.log(`<-- ${req.method} ${pathname} ${res.statusCode} ${Math.round(performance.now() - start)}ms`);
+    res.on("finish", () => {
+      console.log(
+        `<-- ${req.method} ${pathname} ${res.statusCode} ${Math.round(performance.now() - start)}ms`,
+      );
     });
 
     Promise.resolve(handler(req, res)).catch((err) => {
       console.error(err);
-      if (!res.headersSent) res.writeHead(500, { 'Content-Type': 'text/plain' });
-      res.end('Internal server error');
+      if (!res.headersSent)
+        res.writeHead(500, { "Content-Type": "text/plain" });
+      res.end("Internal server error");
     });
   };
 }
 
-const server = http.createServer(withLogging(async (req, res) => {
-  if (req.method === 'GET' && req.url === '/pingpong') {
-    const count = await ping();
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end(`pong ${count}`);
-    return;
-  }
+const server = http.createServer(
+  withLogging(async (req, res) => {
+    if (req.method === "GET" && req.url === "/") {
+      const count = await ping();
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end(`pong ${count}`);
+      return;
+    }
 
-  if (req.method === 'GET' && req.url === '/pings') {
-    const currentPings = (await getPersistedPingCount()) || 0;
-    res.writeHead(200, { 'Content-Type': 'text/plain'})
-    res.end(currentPings.toString());
-    return;
-  }
+    if (req.method === "GET" && req.url === "/pings") {
+      const currentPings = (await getPersistedPingCount()) || 0;
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end(currentPings.toString());
+      return;
+    }
 
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Not found');
-}));
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not found");
+  }),
+);
 
 initDb()
   .then(() => {
@@ -95,7 +104,7 @@ initDb()
     });
   })
   .catch((err) => {
-    console.error('Could not initialize the database', err);
+    console.error("Could not initialize the database", err);
     process.exit(1);
   });
 
@@ -104,5 +113,5 @@ function shutdown(signal) {
   server.close(() => sql.end().then(() => process.exit(0)));
 }
 
-process.on('SIGTERM', () => shutdown('SIGTERM'));
-process.on('SIGINT', () => shutdown('SIGINT'));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
