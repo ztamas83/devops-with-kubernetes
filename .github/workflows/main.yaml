@@ -1,0 +1,73 @@
+name: Release application
+
+on:
+  push:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north2-a
+  REGISTRY: europe-north2-docker.pkg.dev
+  REPOSITORY: dwk-repo
+  SERVICE: dwk-project
+  BRANCH: ${{ github.ref_name }}
+
+# ...
+jobs:
+  build-publish-deploy:
+    name: Build, Publish and Deploy
+    runs-on: ubuntu-latest
+    environment: GKE_PROJECT
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
+          service_account: "${{ secrets.SERVICE_ACCOUNT }}"
+
+      - name: 'Set up Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: 'Use gcloud CLI'
+        run: gcloud info
+      - run: gcloud --quiet auth configure-docker $REGISTRY
+      - name: 'Get GKE credentials'
+        uses: 'google-github-actions/get-gke-credentials@v3'
+        with:
+          cluster_name: '${{ env.GKE_CLUSTER }}'
+          project_id: '${{ env.PROJECT_ID }}'
+          location: '${{ env.GKE_ZONE }}'
+      - name : 'Form the image name'
+        run: |
+          echo "FE_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo-app:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+          echo "BE_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo-backend:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+
+      - name: Build images
+        run: |
+          docker build --tag $FE_IMAGE_TAG todo_app
+          docker build --tag $BE_IMAGE_TAG todo_backend
+
+      - name: Publish
+        run: | 
+          docker push $FE_IMAGE_TAG
+          docker push $BE_IMAGE_TAG
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v3
+
+      - name: Deploy
+        run: |-
+            kustomize edit set image IMAGE/BACKEND=$BE_IMAGE_TAG
+            kustomize edit set image IMAGE/FRONTEND=$FE_IMAGE_TAG
+            kustomize build . | kubectl apply -f -
+            kubectl rollout status deployment
+            kubectl get services -o wide
+
+      
