@@ -82,3 +82,17 @@ curl localhost:3001/todos
 ```bash
 docker build -t todo-backend .
 ```
+
+## Postgres: DBaaS vs DIY
+
+| | DBaaS | DIY | Winner |
+| - | ----- | --- | ------ |
+| Initialization: required work | simple, one command / GCP console / IaC | advanced, configuration of ENV variables, secret handling, manifests for deployment | DBaaS |
+| Initialization: costs | I presume a minimum cost of around $30/month for a Cloud SQL instance | Irrelevant in a running cluster | DIY |
+| Maintenance: required work | little, few clicks | moderate, need to update image version, eventual data migration | DBaaS |
+| Maintenance: costs | variable, depending on e.g. backup size, etc | disks are allocated per size, not dynamic | DBaaS |
+| Backup methods | GCP configured, Cloud Run scheduled jobs, k8s CronJob | k8s CronJob, manual script | DBaaS |
+| Backup: ease of use | simple | advanced | DBaaS |
+
+DBaaS is the clean winner in terms of required work and ease of use but definitely involves higher costs due to monthly fixed costs. DIY solution is cost effective as the k8s cluster is already available and the resources required by PostgreSQL is negligible in a bigger cluster.
+I would choose DBaaS for a smoother experience and focus on my own workloads instead.
