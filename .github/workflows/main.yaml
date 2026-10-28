@@ -62,6 +62,16 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v3
 
+      - name: Install sops
+        run: |
+          curl -sSLo /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.linux.amd64
+          chmod +x /usr/local/bin/sops
+
+      - name: Decrypt secrets
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: sops --decrypt infra/base/secrets.enc.yaml > infra/base/secrets.yaml
+
       - name: Deploy
         run: |-
             kustomize edit set image IMAGE/BACKEND=$BE_IMAGE_TAG
