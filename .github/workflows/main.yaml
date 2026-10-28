@@ -2,6 +2,8 @@ name: Release application
 
 on:
   push:
+    paths-ignore:
+      - '.github/workflows/remove_branch.yaml'
 
 permissions:
   contents: read
