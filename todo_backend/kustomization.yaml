@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - manifests/deployment.yaml
   - manifests/service.yaml
-  - manifests/httpRoute.yaml

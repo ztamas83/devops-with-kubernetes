@@ -5,7 +5,7 @@ metadata:
   namespace: project
 spec:
   parentRefs:
-  - name: gateway
+  - name: project-gateway
   rules:
     - matches:
         - path:

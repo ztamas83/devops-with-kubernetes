@@ -4,7 +4,6 @@ resources:
   - manifests/configMap.yaml
   - manifests/deployment.yaml
   - manifests/service.yaml
-  - manifests/httpRoute.yaml
 images:
   - name: IMAGE/FRONTEND
     newName: ztamas/todo-app:2.6

@@ -72,13 +72,26 @@ jobs:
           SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
         run: sops --decrypt infra/base/secrets.enc.yaml > infra/base/secrets.yaml
 
+      - name: Set namespace
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$BRANCH" = "$DEFAULT_BRANCH" ]; then
+            NAMESPACE=project
+          else
+            NAMESPACE=$BRANCH
+          fi
+          echo "NAMESPACE=$NAMESPACE" >> $GITHUB_ENV
+          echo "Using namespace: $NAMESPACE"
+
       - name: Deploy
         run: |-
-            kubectl config set-context --current --namespace=project
+            if [ "$NAMESPACE" = "project" ]; then OVERLAY=prod; else OVERLAY=branch; fi
+            cd k8s/$OVERLAY
+            if [ "$OVERLAY" = "branch" ]; then kustomize edit set namespace $NAMESPACE; fi
+            kubectl config set-context --current --namespace=$NAMESPACE
             kustomize edit set image IMAGE/BACKEND=$BE_IMAGE_TAG
             kustomize edit set image IMAGE/FRONTEND=$FE_IMAGE_TAG
             kustomize build . | kubectl apply -f -
             kubectl rollout status deployment
             kubectl get services -o wide
-
-      
