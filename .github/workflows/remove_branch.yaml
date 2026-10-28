@@ -2,7 +2,12 @@ name: Remove branch environment
 
 on:
   delete:
-
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch whose environment should be removed
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -15,14 +20,14 @@ env:
   REGISTRY: europe-north2-docker.pkg.dev
   REPOSITORY: dwk-repo
   SERVICE: dwk-project
-  BRANCH: ${{ github.event.ref }}
+  BRANCH: ${{ inputs.branch || github.event.ref }}
 
 
 jobs:
   remove-environment:
     name: Remove environment
     # The delete event also fires for tags (e.g. exercise releases)
-    if: github.event.ref_type == 'branch'
+    if: github.event_name == 'workflow_dispatch' || github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     environment: GKE_PROJECT
 
@@ -61,9 +66,16 @@ jobs:
         run: sops --decrypt infra/base/secrets.enc.yaml > infra/base/secrets.yaml
 
       - name: Set namespace
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
+          # A manual run could name the default branch, which would delete production
+          if [ -z "$BRANCH" ] || [ "$BRANCH" = "$DEFAULT_BRANCH" ] || [ "$BRANCH" = "project" ]; then
+            echo "Refusing to remove environment for branch '$BRANCH'"
+            exit 1
+          fi
           echo "NAMESPACE=$BRANCH" >> $GITHUB_ENV
-          echo "Using namespace: $NAMESPACE"
+          echo "Using namespace: $BRANCH"
       - name: Deploy
         run: |-
             cd k8s/branch
