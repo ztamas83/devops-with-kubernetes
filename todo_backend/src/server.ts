@@ -19,6 +19,7 @@ function shutdown(signal: string) {
 const server = Bun.serve({
   port: config.port,
   routes: withLogging({
+    "/": { GET() { return new Response("Healthy", { status: 200, headers: { "Content-Type": "text/plain"}} )} },
     ...todoRoutes(todoService),
   }),
   fetch: logged(() => new Response("Not found", { status: 404 })),

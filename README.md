@@ -38,3 +38,4 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 - [3.2.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.2)
 - [3.3.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.3/infra/exercise)
 - [3.4.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.4/ping_pong)
+- [3.5.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.5)

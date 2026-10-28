@@ -5,6 +5,8 @@ metadata:
   namespace: project
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: todo-app
@@ -17,9 +19,11 @@ spec:
         - name: images-volume
           persistentVolumeClaim:
             claimName: images-pvc
+      securityContext:
+        fsGroup: 1000
       containers:
         - name: todo-app
-          image: ztamas/todo-app:2.6
+          image: IMAGE/FRONTEND
           volumeMounts:
             - name: images-volume
               mountPath: /usr/src/app/images
@@ -32,4 +36,3 @@ spec:
           ports:
             - name: http
               containerPort: 3000
-

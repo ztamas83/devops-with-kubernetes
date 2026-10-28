@@ -1,0 +1,5 @@
+nameReference:
+  - kind: Gateway
+    fieldSpecs:
+      - kind: HTTPRoute
+        path: spec/parentRefs/name

@@ -8,7 +8,7 @@ spec:
   selector:
     app: todo-app # This is the app as declared in the deployment.
   ports:
-    - port: 2100 # This is the port that is available outside. Value for nodePort can be between 30000-32767
+    - port: 80 # This is the port that is available outside. Value for nodePort can be between 30000-32767
       protocol: TCP
       targetPort: http # This is the target port
       name: http
