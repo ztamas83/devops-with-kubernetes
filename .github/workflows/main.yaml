@@ -74,6 +74,7 @@ jobs:
 
       - name: Deploy
         run: |-
+            kubectl config set-context --current --namespace=project
             kustomize edit set image IMAGE/BACKEND=$BE_IMAGE_TAG
             kustomize edit set image IMAGE/FRONTEND=$FE_IMAGE_TAG
             kustomize build . | kubectl apply -f -
