@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup-job
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: gcs-key
+              secret:
+                secretName: storage-sa-key
+                
+          containers:
+          - name: todo-backup
+            image: ztamas/todo-backup:1.1
+            volumeMounts:
+              - name: gcs-key
+                mountPath: /var/secrets/gcs
+                readOnly: true
+            env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/gcs/key.json
+            - name: POSTGRES_HOST
+              value: "postgres-svc"
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: infra-config
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: infra-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              value: postgres
+            - name: GCS_BUCKET
+              value: dwk-postgres-backup
+          restartPolicy: Never

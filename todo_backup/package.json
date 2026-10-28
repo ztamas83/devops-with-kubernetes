@@ -1,0 +1,14 @@
+{
+  "name": "todo-backup",
+  "version": "1.0.0",
+  "description": "Dumps a Postgres database with pg_dump and uploads the dump to a Google Cloud Storage bucket",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@google-cloud/storage": "8.4.0"
+  }
+}
