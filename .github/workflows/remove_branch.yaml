@@ -1,0 +1,76 @@
+name: Remove branch environment
+
+on:
+  delete:
+
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north2-a
+  REGISTRY: europe-north2-docker.pkg.dev
+  REPOSITORY: dwk-repo
+  SERVICE: dwk-project
+  BRANCH: ${{ github.ref_name }}
+
+
+jobs:
+  remove-environment:
+    name: Remove environment
+    # The delete event also fires for tags (e.g. exercise releases)
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    environment: GKE_PROJECT
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
+          service_account: "${{ secrets.SERVICE_ACCOUNT }}"
+
+      - name: 'Set up Cloud SDK'
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: 'Use gcloud CLI'
+        run: gcloud info
+      - run: gcloud --quiet auth configure-docker $REGISTRY
+      - name: 'Get GKE credentials'
+        uses: 'google-github-actions/get-gke-credentials@v3'
+        with:
+          cluster_name: '${{ env.GKE_CLUSTER }}'
+          project_id: '${{ env.PROJECT_ID }}'
+          location: '${{ env.GKE_ZONE }}'
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v3
+
+      - name: Install sops
+        run: |
+          curl -sSLo /usr/local/bin/sops https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.linux.amd64
+          chmod +x /usr/local/bin/sops
+
+      - name: Decrypt secrets
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: sops --decrypt infra/base/secrets.enc.yaml > infra/base/secrets.yaml
+
+      - name: Set namespace
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          echo "NAMESPACE=$BRANCH" >> $GITHUB_ENV
+          echo "Using namespace: $NAMESPACE"
+      - name: Deploy
+        run: |-
+            cd k8s/branch
+            kustomize edit set namespace $NAMESPACE
+            kubectl config set-context --current --namespace=$NAMESPACE
+            kustomize build . | kubectl delete -f -
+            kubectl rollout status deployment
+            kubectl get services -o wide
