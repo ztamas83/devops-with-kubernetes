@@ -20,5 +20,5 @@ resource "google_storage_bucket" "backup-bucket" {
   project = var.project_id
   location = var.region
   name = "dwk-postgres-backup"
-  public_access_prevention = true
+  public_access_prevention = "enforced"
 }
