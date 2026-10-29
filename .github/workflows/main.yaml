@@ -2,6 +2,9 @@ name: Release application
 
 on:
   push:
+    # Only branch pushes; tag pushes (exercise releases) are excluded
+    branches:
+      - '**'
     paths-ignore:
       - '.github/workflows/remove_branch.yaml'
 
