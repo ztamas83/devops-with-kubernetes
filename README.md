@@ -45,3 +45,4 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 - [3.9.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.9/todo_backend)
 - [3.10.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.10/todo_backup)
 - [3.11.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.11/todo_backend)
+- [3.12.](https://github.com/ztamas83/devops-with-kubernetes/tree/3.12)
