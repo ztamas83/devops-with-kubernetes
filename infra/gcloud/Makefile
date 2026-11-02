@@ -2,6 +2,8 @@ PROJECT_ID := $(shell sed -n 's/^project_id *= *"\(.*\)"/\1/p' terraform.tfvars)
 LOCATION   := global
 POOL_ID    := github-pool
 PROVIDER_ID := github-provider
+CLUSTER    := dwk-cluster
+ZONE       := europe-north2-a
 
 POOL_RES     := google_iam_workload_identity_pool.dwk-gh-pool
 PROVIDER_RES := google_iam_workload_identity_pool_provider.dwk-gh-provider
@@ -58,6 +60,7 @@ plan: import
 
 apply: import
 	terraform apply
+	gcloud container clusters get-credentials $(CLUSTER) --zone=$(ZONE) --project=$(PROJECT_ID)
 
 destroy: init
 	terraform destroy
