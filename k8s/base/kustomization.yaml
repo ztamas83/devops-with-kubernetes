@@ -6,6 +6,6 @@ resources:
   - ../../todo_app
 images:
   - name: IMAGE/BACKEND
-    newName: ztamas/todo-backend:4.2
+    newName: ztamas/todo-backend:4.5
   - name: IMAGE/FRONTEND
-    newName: ztamas/todo-app:4.2.2
+    newName: ztamas/todo-app:4.5

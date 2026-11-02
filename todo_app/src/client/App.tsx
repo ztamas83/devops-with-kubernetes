@@ -5,6 +5,7 @@ const MAX_TODO_LENGTH = 140;
 interface Todo {
   id: string;
   text: string;
+  done: boolean;
 }
 
 export function App() {
@@ -40,6 +41,17 @@ export function App() {
       setText("");
     } catch (err) {
       console.error("Failed to create todo", err);
+    }
+  }
+
+  async function handleMarkDone(id: string) {
+    try {
+      const res = await fetch(`/todos/${id}`, { method: "PUT" });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const updated: Todo = await res.json();
+      setTodos((prev) => prev.map((todo) => (todo.id === updated.id ? updated : todo)));
+    } catch (err) {
+      console.error("Failed to mark todo done", err);
     }
   }
 
@@ -85,7 +97,16 @@ export function App() {
         <h2 className="headline web-subtitle">Todos</h2>
         <ul className="todo-list">
           {todos.map((todo) => (
-            <li key={todo.id} className="todo-card">{todo.text}</li>
+            <li key={todo.id} className={todo.done ? "todo-card todo-card-done" : "todo-card"}>
+              <span className="todo-text">{todo.text}</span>
+              {todo.done ? (
+                <span className="todo-done-label">Done</span>
+              ) : (
+                <button className="btn btn-small" type="button" onClick={() => handleMarkDone(todo.id)}>
+                  Mark done
+                </button>
+              )}
+            </li>
           ))}
         </ul>
       </section>

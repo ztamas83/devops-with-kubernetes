@@ -4,7 +4,7 @@ Bun server that serves a React SPA on `GET /`. Prints `Server started in port NN
 
 The client lives in `src/client` and is bundled by Bun through the HTML import in `src/server.ts`.
 
-The page shows the title, a random image (300x300) served from `GET /api/image`, an input field (max 140 characters) with a "Send" button, the list of todos and a red "Break app" button. The button makes the app report unhealthy until it is restarted; the page then shows only a "System failure, wait for recovery" warning.
+The page shows the title, a random image (300x300) served from `GET /api/image`, an input field (max 140 characters) with a "Send" button, the list of todos (each with a "Mark done" button that sends `PUT /todos/:id`; done todos get a green marker, strikethrough text and a green "Done" label) and a red "Break app" button. The button makes the app report unhealthy until it is restarted; the page then shows only a "System failure, wait for recovery" warning.
 
 Todos are served by the separate [todo_backend](../todo_backend) service. The SPA calls `GET /todos` and `POST /todos` on its own origin; in the cluster the Ingress routes `/todos` to todo-backend. For local development set `TODO_BACKEND_URL` and this server proxies `/todos` to the backend.
 
@@ -19,7 +19,7 @@ The image is fetched from `IMAGE_SOURCE_URL` and cached on disk in `IMAGE_DIR`. 
 | `GET` | `/api/health` | `{ "broken": boolean }`, whether the app was broken with `/api/break` |
 | `POST` | `/api/break` | Makes `/healthz` return `503` for the rest of the process lifetime. Used by the "Break app" button |
 | `GET` | `/api/image` | Random image (JPEG), cached on disk for `IMAGE_MAX_AGE_MS` |
-| any | `/todos` | Proxied to `TODO_BACKEND_URL` when set, `404` otherwise |
+| any | `/todos`, `/todos/:id` | Proxied to `TODO_BACKEND_URL` when set, `404` otherwise |
 | any | `/crash` | Aborts the process immediately (`process.abort()`). For testing container restarts and that the cached image survives them |
 
 Server code layout (`src/server`):

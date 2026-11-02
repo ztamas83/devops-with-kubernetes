@@ -35,6 +35,7 @@ const server = Bun.serve({
     ...healthRoutes(healthService),
     ...imageRoutes(imageService),
     "/todos": proxyToTodoBackend,
+    "/todos/:id": proxyToTodoBackend,
   },
   development: process.env.NODE_ENV !== "production",
 });

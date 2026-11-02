@@ -2,7 +2,7 @@
 
 Bun server that serves the todo REST API used by the [todo_app](../todo_app) SPA. Prints `Server started on port NNNN` on startup.
 
-Todos are stored in the `todos` table of a Postgres database, using Bun's built-in SQL client (`Bun.SQL`). On startup the server creates the table if it does not exist. It retries the first connection 10 times, 3 seconds apart, so it can start before the database is ready.
+Todos are stored in the `todos` table of a Postgres database, using Bun's built-in SQL client (`Bun.SQL`). On startup the server applies the pending schema migrations from `src/migrations.ts` (see [Migrations](#migrations)). It retries the first connection 10 times, 3 seconds apart, so it can start before the database is ready.
 
 ## Endpoints
 
@@ -10,6 +10,7 @@ Todos are stored in the `todos` table of a Postgres database, using Bun's built-
 | ------ | ---- | ----------- |
 | `GET` | `/healthz` | `200 healthy` when the database answers a `SELECT 1`, `503 unhealthy` otherwise |
 | `GET` | `/todos` | List of todos (JSON) |
+| `PUT` | `/todos/:id` | Mark a todo done. No body. Returns the updated todo, `400` if the id is not a UUID, `404` if no todo has the id |
 | `POST` | `/todos` | Create a todo. Body: `{ "text": "..." }`. Returns the created todo with `201`, or `400` if the text is missing, empty or longer than 140 characters |
 
 Every request is logged to stdout with method, path, response status and duration:
@@ -24,6 +25,18 @@ Code layout (`src`):
 - `services/`: business logic (validation)
 - `repositories/`: storage (todos in Postgres)
 - `db.ts`: database connection
+- `migrations.ts`: schema migrations
+
+## Migrations
+
+The schema is managed by the numbered migrations in `src/migrations.ts`. On startup the server runs the ones not yet listed in the `schema_migrations` table, in one transaction, and records each applied version. A Postgres advisory lock makes replicas starting at the same time wait for each other instead of applying the same migration twice.
+
+To change the schema, append a new migration with the next version number. Never edit or reorder a migration that has already been applied.
+
+| Version | Change |
+| ------- | ------ |
+| 1 | Create the `todos` table |
+| 2 | Add the `done` flag to `todos` |
 
 ## Configuration
 

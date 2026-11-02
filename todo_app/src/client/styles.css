@@ -20,6 +20,7 @@
   --danger-hover: #b71c1c;
   --danger-surface: #fdecea;
   --on-danger: #fff;
+  --success: #2e7d32;
   --space-xs: 0.6rem;
   --space-s: 1rem;
   --space-m: 1.5rem;
@@ -164,6 +165,11 @@ body {
 .todo-card {
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  text-align: left;
   padding: var(--space-m) var(--space-l);
   border-radius: var(--r-md);
   background: var(--surface);
@@ -177,4 +183,25 @@ body {
   left: 0;
   width: 6px;
   background: var(--accent);
+}
+
+.todo-card-done::before { background: var(--success); }
+.todo-card-done .todo-text { text-decoration: line-through; color: var(--text-muted); }
+
+.todo-text { overflow-wrap: anywhere; }
+
+.btn-small {
+  flex-shrink: 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+}
+
+.todo-done-label {
+  flex-shrink: 0;
+  color: var(--success);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }

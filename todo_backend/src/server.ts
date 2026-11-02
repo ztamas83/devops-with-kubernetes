@@ -5,9 +5,11 @@ import { createPostgresTodoRepository } from "./repositories/todoRepository";
 import { createTodoService } from "./services/todoService";
 import { config } from "./config";
 import { isDatabaseReachable, sql, waitForDatabase } from "./db";
+import { runMigrations } from "./migrations";
 
 await waitForDatabase();
-const todoService = createTodoService(await createPostgresTodoRepository(sql));
+await runMigrations(sql);
+const todoService = createTodoService(createPostgresTodoRepository(sql));
 
 function shutdown(signal: string) {
   console.log(`Received ${signal}, shutting down`);
