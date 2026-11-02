@@ -30,18 +30,26 @@ LOG_APP_DIR        := $(DIR_log-app)/manifests
 INFRA_NAMESPACE    := default
 EXERCISE_NAMESPACE := exercises
 
+# Cluster add-ons installed by bootstrap. Argo Rollouts runs a master build for the
+# Google Managed Prometheus authentication in AnalysisTemplates, pinned to a commit and image digest
+ARGO_ROLLOUTS_REF   := 1798597f6ac230dbb6efcfa51c57cbd51d2f5031
+ARGO_ROLLOUTS_IMAGE := quay.io/argoproj/argo-rollouts@sha256:a34b3afbfa32258b736a92d63b654bdee35c8aae43e70e00e23fa05e4c150f6f
+NATS_CHART_VERSION  := 2.15.2
+NATS_PODMONITORING  := infra/monitoring/nats-podmonitoring.yaml
+
 # $(call apply-shared,<namespace>) applies the config and secret to a namespace
 define apply-shared
 sops --decrypt $(INFRA_SECRETS) | kubectl -n $(1) apply -f -
 kubectl -n $(1) apply -f $(INFRA_CONFIG)
 endef
 
-.PHONY: help todo namespace exercise-deploy infra-deploy $(APPS)
+.PHONY: help todo namespace exercise-deploy infra-deploy bootstrap $(APPS)
 
 help:
 	@echo "Usage: make <app> <version>"
 	@echo "Apps: $(APPS)"
 	@echo "Groups: todo (todo-app todo-backend)"
+	@echo "Cluster: bootstrap (Argo Rollouts, NATS, NATS PodMonitoring), run after the cluster is created"
 	@echo "Deploy: exercise-deploy (infra + $(EXERCISE_DIR) + ping-pong + log-app, postgres in $(INFRA_NAMESPACE), rest in $(EXERCISE_NAMESPACE))"
 
 $(APPS):
@@ -64,6 +72,20 @@ exercise-deploy: infra-deploy namespace
 	$(if $(EXERCISE_MANIFESTS),kubectl -n $(EXERCISE_NAMESPACE) apply $(addprefix -f ,$(EXERCISE_MANIFESTS)))
 	kubectl -n $(EXERCISE_NAMESPACE) apply -f $(PING_PONG_DIR)
 	kubectl -n $(EXERCISE_NAMESPACE) apply -f $(LOG_APP_DIR)
+
+# Installs the cluster add-ons the exercises need on a fresh cluster. Safe to rerun.
+# The PodMonitoring CRD comes with GKE managed collection, only the resource is applied.
+# Server-side apply: the Argo Rollouts CRDs are too large for the client-side last-applied annotation.
+bootstrap:
+	kubectl create namespace argo-rollouts --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply --server-side --force-conflicts -n argo-rollouts \
+		-f https://raw.githubusercontent.com/argoproj/argo-rollouts/$(ARGO_ROLLOUTS_REF)/manifests/install.yaml
+	kubectl -n argo-rollouts set image deploy/argo-rollouts argo-rollouts=$(ARGO_ROLLOUTS_IMAGE)
+	kubectl -n argo-rollouts rollout status deploy/argo-rollouts --timeout=180s
+	helm repo add nats https://nats-io.github.io/k8s/helm/charts/ --force-update
+	helm upgrade --install my-nats nats/nats --version $(NATS_CHART_VERSION) \
+		--namespace nats --create-namespace --set promExporter.enabled=true --wait
+	kubectl apply -f $(NATS_PODMONITORING)
 
 # Turn the version goal into a no-op so make does not try to build it
 ifneq ($(word 2,$(MAKECMDGOALS)),)

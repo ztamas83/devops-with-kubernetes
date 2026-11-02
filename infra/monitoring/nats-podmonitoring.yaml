@@ -1,0 +1,14 @@
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: nats
+  namespace: nats # PodMonitoring only selects pods in its own namespace
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nats
+      app.kubernetes.io/component: nats # Excludes the nats-box pod, it has no metrics port
+  endpoints:
+    - port: prom-metrics # prom-exporter sidecar, container port 7777
+      path: /metrics
+      interval: 30s
