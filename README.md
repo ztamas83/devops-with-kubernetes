@@ -52,3 +52,4 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 - [4.1.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.1)
 - [4.2.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.2/todo_app)
 - [4.3.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.3/infra/monitoring)
+- [4.4.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.4/ping_pong)

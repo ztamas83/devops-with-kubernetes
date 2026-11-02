@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: ex-cpu-usage
+spec:
+  metrics:
+    - name: ex-cpu-usage
+      initialDelay: 30s
+      successCondition: result < 0.1
+      provider:
+        prometheus:
+          address: http://prom-prometheus-server.monitoring.svc.cluster.local # DNS name for my Prometheus, find yours with kubectl describe svc ...
+          query: |
+            scalar(
+              sum(rate(container_cpu_usage_seconds_total{namespace="exercises", container!="", container!="POD"}[5m]))
+            )
