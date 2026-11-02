@@ -16,6 +16,13 @@ resource "google_project_iam_member" "obj-viewer" {
   member  = google_service_account.cluster-sa.member
 }
 
+resource "google_project_iam_member" "monitoring-viewer" {
+  project = var.project_id
+  role    = "roles/monitoring.viewer"
+  member  = google_service_account.cluster-sa.member
+}
+
+
 resource "google_storage_bucket" "backup-bucket" {
   project = var.project_id
   location = var.region

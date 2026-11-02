@@ -14,7 +14,7 @@ spec:
       steps:
         - setWeight: 50
         - pause:
-            duration: 30s
+            duration: 10s
         - analysis:
             templates:
               - templateName: ex-cpu-usage
@@ -25,9 +25,9 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:4.1
+          image: ztamas/ping-pong:4.1.1
           readinessProbe:
-            initialDelaySeconds: 10 # Initial delay until the readiness is tested
+            initialDelaySeconds: 5 # Initial delay until the readiness is tested
             periodSeconds: 5 # How often to test
             httpGet:
               path: /healthz

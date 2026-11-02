@@ -6,10 +6,12 @@ spec:
   metrics:
     - name: ex-cpu-usage
       initialDelay: 30s
-      successCondition: result < 0.1
+      successCondition: result < 0.08
       provider:
         prometheus:
-          address: http://prom-prometheus-server.monitoring.svc.cluster.local # DNS name for my Prometheus, find yours with kubectl describe svc ...
+          address: https://monitoring.googleapis.com/v1/projects/k8s-course-512506/location/global/prometheus
+          authentication:
+            google: {}
           query: |
             scalar(
               sum(rate(container_cpu_usage_seconds_total{namespace="exercises", container!="", container!="POD"}[5m]))
