@@ -6,7 +6,8 @@ on:
     branches:
       - '**'
     paths-ignore:
-      - '.github/workflows/remove_branch.yaml'
+      - ".github/workflows/remove_branch.yaml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -37,19 +38,19 @@ jobs:
           workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
           service_account: "${{ secrets.SERVICE_ACCOUNT }}"
 
-      - name: 'Set up Cloud SDK'
+      - name: "Set up Cloud SDK"
         uses: google-github-actions/setup-gcloud@v3
 
-      - name: 'Use gcloud CLI'
+      - name: "Use gcloud CLI"
         run: gcloud info
       - run: gcloud --quiet auth configure-docker $REGISTRY
-      - name: 'Get GKE credentials'
-        uses: 'google-github-actions/get-gke-credentials@v3'
+      - name: "Get GKE credentials"
+        uses: "google-github-actions/get-gke-credentials@v3"
         with:
-          cluster_name: '${{ env.GKE_CLUSTER }}'
-          project_id: '${{ env.PROJECT_ID }}'
-          location: '${{ env.GKE_ZONE }}'
-      - name : 'Form the image name'
+          cluster_name: "${{ env.GKE_CLUSTER }}"
+          project_id: "${{ env.PROJECT_ID }}"
+          location: "${{ env.GKE_ZONE }}"
+      - name: "Form the image name"
         run: |
           echo "FE_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo-app:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
           echo "BE_IMAGE_TAG=$REGISTRY/$PROJECT_ID/$REPOSITORY/todo-backend:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
@@ -60,7 +61,7 @@ jobs:
           docker build --tag $BE_IMAGE_TAG todo_backend
 
       - name: Publish
-        run: | 
+        run: |
           docker push $FE_IMAGE_TAG
           docker push $BE_IMAGE_TAG
 
@@ -91,12 +92,12 @@ jobs:
 
       - name: Deploy
         run: |-
-            if [ "$NAMESPACE" = "project" ]; then OVERLAY=prod; else OVERLAY=branch; fi
-            cd k8s/$OVERLAY
-            if [ "$OVERLAY" = "branch" ]; then kustomize edit set namespace $NAMESPACE; fi
-            kubectl config set-context --current --namespace=$NAMESPACE
-            kustomize edit set image IMAGE/BACKEND=$BE_IMAGE_TAG
-            kustomize edit set image IMAGE/FRONTEND=$FE_IMAGE_TAG
-            kustomize build . | kubectl apply -f -
-            kubectl rollout status deployment
-            kubectl get services -o wide
+          if [ "$NAMESPACE" = "project" ]; then OVERLAY=prod; else OVERLAY=branch; fi
+          cd k8s/$OVERLAY
+          if [ "$OVERLAY" = "branch" ]; then kustomize edit set namespace $NAMESPACE; fi
+          kubectl config set-context --current --namespace=$NAMESPACE
+          kustomize edit set image IMAGE/BACKEND=$BE_IMAGE_TAG
+          kustomize edit set image IMAGE/FRONTEND=$FE_IMAGE_TAG
+          kustomize build . | kubectl apply -f -
+          kubectl rollout status deployment
+          kubectl get services -o wide

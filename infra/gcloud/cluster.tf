@@ -2,6 +2,10 @@ resource "google_container_cluster" "dwk-cluster" {
   name     = "dwk-cluster"
   location = "europe-north2-a"
   deletion_protection = false
+  gateway_api_config {
+    channel = "CHANNEL_STANDARD"  
+  }
+  
 }
 
 resource "google_container_node_pool" "dwk-pool" {
