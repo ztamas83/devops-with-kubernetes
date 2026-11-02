@@ -38,6 +38,15 @@ async function readPing() {
   return Number.parseInt(await res.text());
 }
 
+async function checkPingHealth() {
+  const res = await fetch(`${PING_SVC_URL}/healthz`, {
+    signal: AbortSignal.timeout(PING_TIMEOUT_MS),
+  });
+  if (!res.ok) {
+    throw new Error(`Ping health check failed: ${res.status} ${res.statusText}`);
+  }
+}
+
 // Middleware: logs each request and its response status with the handling time
 function withLogging(handler) {
   return async (req, server) => {
@@ -77,6 +86,17 @@ if (process.env.SERVER && process.env.SERVER === "1") {
     routes: {
       "/": {
         GET: () => new Response("Healthy", { status: 200 })
+      },
+      "/healthz": {
+        GET: withLogging(async () => {
+          try {
+            await checkPingHealth();
+            return new Response("healthy", { status: 200 });
+          } catch (err) {
+            console.error(`Health check failed: ${err.message}`);
+            return new Response("unhealthy", { status: 503 });
+          }
+        }),
       },
       "/status": {
         GET: withLogging(async () => {

@@ -5,6 +5,7 @@ Runs on [Bun](https://bun.sh). One image, two roles, selected with the `SERVER` 
 - **Generator** (default): generates a random UUID on startup and overwrites `log.txt` with a single `<timestamp> <uuid>` line every 5 seconds.
 - **Server** (`SERVER=1`): serves the log over HTTP.
   - `GET /status` returns the content of `log.txt` followed by `Ping / Pongs: <count>`, where the count is fetched from `GET $PING_SVC_URL/pings` of [ping_pong](../ping_pong). Responds `502` if the log or the ping count cannot be read.
+  - `GET /healthz` returns `200 healthy` when `GET $PING_SVC_URL/healthz` of ping_pong returns `200` within 1 second, otherwise `503 unhealthy`.
   - Every request and response is logged to the console.
 
 ## Environment variables

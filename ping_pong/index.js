@@ -45,6 +45,16 @@ async function getPersistedPingCount() {
   return row ? row.count : null;
 }
 
+async function isDbReachable() {
+  try {
+    await sql`SELECT 1`;
+    return true;
+  } catch (err) {
+    console.error(`Health check failed: ${err.message}`);
+    return false;
+  }
+}
+
 async function ping() {
   const [row] = await sql`
     INSERT INTO pongs (id, count) VALUES (1, 0)
@@ -78,11 +88,12 @@ function withLogging(handler) {
 
 const server = http.createServer(
   withLogging(async (req, res) => {
-    // if (req.method === "GET" && (req.url === "/")) {
-    //   res.writeHead(200, { "Content-Type": "text/plain" });
-    //   res.end(`Healthy`);
-    //   return;
-    // }
+    if (req.method === "GET" && req.url === "/healthz") {
+      const healthy = await isDbReachable();
+      res.writeHead(healthy ? 200 : 503, { "Content-Type": "text/plain" });
+      res.end(healthy ? "healthy" : "unhealthy");
+      return;
+    }
 
     if (req.method === "GET" && (req.url === "/")) {
       const count = await ping();

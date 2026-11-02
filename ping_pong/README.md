@@ -4,6 +4,8 @@ Responds to `GET /pingpong` with `pong <count>` and increments the counter. The 
 
 `GET /pings` returns the current count without incrementing it (`0` if nothing is stored yet). [log_service](../log_service) uses it to show the count.
 
+`GET /healthz` returns `200 healthy` when the database answers a `SELECT 1`, otherwise `503 unhealthy`.
+
 On startup the app creates the `pongs` table if it does not exist. It retries the connection 10 times, 3 seconds apart, so it can start before the database is ready.
 
 Every request and response is logged to the console.

@@ -15,7 +15,13 @@ spec:
     spec:
       containers:
         - name: pingpong
-          image: ztamas/ping-pong:3.4
+          image: ztamas/ping-pong:4.1
+          readinessProbe:
+            initialDelaySeconds: 10 # Initial delay until the readiness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+              path: /healthz
+              port: 3000
           env:
             - name: PORT
               value: "3000"
