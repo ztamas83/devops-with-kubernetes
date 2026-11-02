@@ -10,8 +10,14 @@ interface Todo {
 export function App() {
   const [text, setText] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [broken, setBroken] = useState(false);
 
   useEffect(() => {
+    fetch("/api/health")
+      .then((res) => res.json())
+      .then((health: { broken: boolean }) => setBroken(health.broken))
+      .catch((err) => console.error("Failed to load health state", err));
+
     fetch("/todos")
       .then((res) => res.json())
       .then(setTodos)
@@ -35,6 +41,26 @@ export function App() {
     } catch (err) {
       console.error("Failed to create todo", err);
     }
+  }
+
+  async function handleBreak() {
+    try {
+      const res = await fetch("/api/break", { method: "POST" });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      setBroken(true);
+    } catch (err) {
+      console.error("Failed to break the app", err);
+    }
+  }
+
+  if (broken) {
+    return (
+      <main className="page">
+        <div className="failure-box" role="alert">
+          System failure, wait for recovery
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -63,6 +89,9 @@ export function App() {
           ))}
         </ul>
       </section>
+      <button className="btn btn-danger" type="button" onClick={handleBreak}>
+        Break app
+      </button>
     </main>
   );
 }

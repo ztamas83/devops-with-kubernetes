@@ -1,9 +1,10 @@
 import { logged, withLogging } from "./api/requestLogger";
+import { healthRoutes } from "./api/healthRoutes";
 import { todoRoutes } from "./api/todoRoutes";
 import { createPostgresTodoRepository } from "./repositories/todoRepository";
 import { createTodoService } from "./services/todoService";
 import { config } from "./config";
-import { sql, waitForDatabase } from "./db";
+import { isDatabaseReachable, sql, waitForDatabase } from "./db";
 
 await waitForDatabase();
 const todoService = createTodoService(await createPostgresTodoRepository(sql));
@@ -20,6 +21,7 @@ const server = Bun.serve({
   port: config.port,
   routes: withLogging({
     "/": { GET() { return new Response("Healthy", { status: 200, headers: { "Content-Type": "text/plain"}} )} },
+    ...healthRoutes(isDatabaseReachable),
     ...todoRoutes(todoService),
   }),
   fetch: logged(() => new Response("Not found", { status: 404 })),

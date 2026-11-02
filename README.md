@@ -50,3 +50,4 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 ### Chapter 5
 
 - [4.1.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.1)
+- [4.2.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.2/todo_app)

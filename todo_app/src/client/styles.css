@@ -16,6 +16,10 @@
   --accent-hover: var(--yellow-2);
   --on-accent: var(--navy);
   --focus-ring: var(--navy);
+  --danger: #c62828;
+  --danger-hover: #b71c1c;
+  --danger-surface: #fdecea;
+  --on-danger: #fff;
   --space-xs: 0.6rem;
   --space-s: 1rem;
   --space-m: 1.5rem;
@@ -115,6 +119,27 @@ body {
   border-color: var(--accent-hover);
   transform: translateY(-2px);
   box-shadow: 0 14px 30px -12px rgba(20, 22, 43, 0.45);
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--on-danger);
+}
+.btn-danger:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+.failure-box {
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--space-m) var(--space-l);
+  border: 1.5px solid rgba(198, 40, 40, 0.35);
+  border-radius: var(--r-lg);
+  background: var(--danger-surface);
+  color: var(--danger);
+  font-weight: 700;
+  box-shadow: 0 14px 30px -18px rgba(198, 40, 40, 0.55);
 }
 
 .todo-section {

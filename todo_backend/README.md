@@ -8,6 +8,7 @@ Todos are stored in the `todos` table of a Postgres database, using Bun's built-
 
 | Method | Path | Description |
 | ------ | ---- | ----------- |
+| `GET` | `/healthz` | `200 healthy` when the database answers a `SELECT 1`, `503 unhealthy` otherwise |
 | `GET` | `/todos` | List of todos (JSON) |
 | `POST` | `/todos` | Create a todo. Body: `{ "text": "..." }`. Returns the created todo with `201`, or `400` if the text is missing, empty or longer than 140 characters |
 

@@ -23,3 +23,13 @@ export async function waitForDatabase(retries = 10, delayMs = 3000) {
     }
   }
 }
+
+export async function isDatabaseReachable() {
+  try {
+    await sql`SELECT 1`;
+    return true;
+  } catch (err) {
+    console.error(`Health check failed: ${(err as Error).message}`);
+    return false;
+  }
+}
