@@ -36,6 +36,7 @@ EXERCISE_NAMESPACE := exercises
 ARGO_ROLLOUTS_REF   := c2c88ae64273e420cb5c01d92ee4bb71d3ae716a
 ARGO_ROLLOUTS_IMAGE := quay.io/argoproj/argo-rollouts@sha256:894ee9f4bf2e9f7496fe63d3835409f71c6600a5401371fcf66b4e5f309b940a
 NATS_CHART_VERSION  := 2.15.2
+ARGOCD_CHART_VERSION := 9.5.0
 NATS_PODMONITORING  := infra/monitoring/nats-podmonitoring.yaml
 
 # $(call apply-shared,<namespace>) applies the config and secret to a namespace
@@ -50,7 +51,7 @@ help:
 	@echo "Usage: make <app> <version>"
 	@echo "Apps: $(APPS)"
 	@echo "Groups: todo (todo-app todo-backend)"
-	@echo "Cluster: bootstrap (Argo Rollouts, NATS, NATS PodMonitoring), run after the cluster is created"
+	@echo "Cluster: bootstrap (Argo Rollouts, NATS, NATS PodMonitoring, Argo CD), run after the cluster is created"
 	@echo "Deploy: exercise-deploy (infra + $(EXERCISE_DIR) + ping-pong + log-app, postgres in $(INFRA_NAMESPACE), rest in $(EXERCISE_NAMESPACE))"
 
 $(APPS):
@@ -87,6 +88,10 @@ bootstrap:
 	helm upgrade --install my-nats nats/nats --version $(NATS_CHART_VERSION) \
 		--namespace nats --create-namespace --set promExporter.enabled=true --wait
 	kubectl apply -f $(NATS_PODMONITORING)
+	helm repo add argo https://argoproj.github.io/argo-helm --force-update
+	helm upgrade --install argocd argo/argo-cd --version $(ARGOCD_CHART_VERSION) \
+		--namespace argocd --create-namespace --wait
+	kubectl -n argocd patch svc argocd-server -p '{"spec": {"type": "LoadBalancer"}}'
 
 # Turn the version goal into a no-op so make does not try to build it
 ifneq ($(word 2,$(MAKECMDGOALS)),)

@@ -55,3 +55,4 @@ MOOC course https://courses.mooc.fi/org/uh-cs/courses/devops-with-kubernetes-202
 - [4.4.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.4/ping_pong)
 - [4.5.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.5/todo_app)
 - [4.6.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.6/todo_broadcaster)
+- [4.7.](https://github.com/ztamas83/devops-with-kubernetes/tree/4.7/Makefile)
