@@ -6,7 +6,7 @@ resources:
 images:
 - name: IMAGE/LOG
   newName: europe-north2-docker.pkg.dev/k8s-course-512506/dwk-repo/log-app
-  newTag: master-7e7316c2f77afb3c6487764b667e61b4243e89ca
+  newTag: master-a40a85d7b5f641a127d6939525501f0f96ccae0f
 - name: IMAGE/PING_PONG
   newName: europe-north2-docker.pkg.dev/k8s-course-512506/dwk-repo/ping-pong
-  newTag: master-7e7316c2f77afb3c6487764b667e61b4243e89ca
+  newTag: master-a40a85d7b5f641a127d6939525501f0f96ccae0f
