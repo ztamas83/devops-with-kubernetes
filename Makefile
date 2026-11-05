@@ -10,8 +10,9 @@ DIR_todo-app  := todo_app
 DIR_todo-backend := todo_backend
 DIR_ping-pong := ping_pong
 DIR_log-app   := log_service
+DIR_todo-broadcaster := todo_broadcaster
 
-APPS := todo-app todo-backend ping-pong log-app
+APPS := todo-app todo-backend ping-pong log-app todo-broadcaster
 
 # Second command line goal is the version, unless given as VERSION=...
 VERSION ?= $(word 2,$(MAKECMDGOALS))

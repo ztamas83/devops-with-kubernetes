@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Todo, TodoRepository } from "../repositories/todoRepository";
+import type { TodoAction, TodoEventPublisher } from "./todoEvents";
 
 export const MAX_TODO_LENGTH = 140;
 
@@ -20,7 +21,16 @@ export interface TodoService {
   markDone(id: string): Promise<Todo>;
 }
 
-export function createTodoService(repository: TodoRepository): TodoService {
+export function createTodoService(repository: TodoRepository, events: TodoEventPublisher): TodoService {
+  // The todo is already saved at this point, so a failed publish is logged and does not fail the request
+  async function announce(todo: Todo, action: TodoAction) {
+    try {
+      await events.publish(todo, action);
+    } catch (err) {
+      console.error(`Publishing todo ${todo.id} ${action} event failed: ${(err as Error).message}`);
+    }
+  }
+
   return {
     listTodos() {
       return repository.getAll();
@@ -31,7 +41,9 @@ export function createTodoService(repository: TodoRepository): TodoService {
       if (!result.success) {
         throw new ValidationError(result.error.issues.map((issue) => issue.message).join(", "));
       }
-      return repository.create(result.data);
+      const todo = await repository.create(result.data);
+      await announce(todo, "created");
+      return todo;
     },
 
     async markDone(id) {
@@ -41,6 +53,7 @@ export function createTodoService(repository: TodoRepository): TodoService {
       }
       const todo = await repository.markDone(result.data);
       if (!todo) throw new NotFoundError(`Todo ${id} not found`);
+      await announce(todo, "done");
       return todo;
     },
   };

@@ -16,6 +16,8 @@ const envSchema = z.object({
   POSTGRES_DB: requiredString,
   POSTGRES_USER: requiredString,
   POSTGRES_PASSWORD: requiredString,
+  NATS_URL: requiredString,
+  NATS_SUBJECT: requiredString,
 });
 
 const result = envSchema.safeParse(process.env);
@@ -32,5 +34,9 @@ export const config = {
     database: env.POSTGRES_DB,
     user: env.POSTGRES_USER,
     password: env.POSTGRES_PASSWORD,
+  },
+  nats: {
+    url: env.NATS_URL,
+    subject: env.NATS_SUBJECT,
   },
 };

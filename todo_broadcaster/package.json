@@ -1,0 +1,19 @@
+{
+  "name": "todo_broadcaster",
+  "version": "1.0.0",
+  "description": "Bun service that subscribes to a NATS subject and forwards every message to an external service",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "build": "bun build src/index.ts --target=bun --production --outdir=dist",
+    "start": "NODE_ENV=production bun dist/index.js"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.3",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@nats-io/transport-node": "^3.0.0"
+  }
+}

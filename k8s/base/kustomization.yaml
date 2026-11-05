@@ -1,11 +1,23 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+configurations:
+  - kustomize-config.yaml
 resources:
   - ../../infra/project/
   - ../../todo_backend
   - ../../todo_app
+  - ../../todo_broadcaster
 images:
   - name: IMAGE/BACKEND
-    newName: ztamas/todo-backend:4.5
+    newName: ztamas/todo-backend:4.6.1
   - name: IMAGE/FRONTEND
     newName: ztamas/todo-app:4.5
+  - name: IMAGE/BROADCASTER
+    newName: ztamas/todo-broadcaster:4.6.3
+configMapGenerator:
+  - name: nats-config
+    namespace: project
+    literals:
+      - NATS_URL=nats://my-nats.nats:4222
+      - NATS_SUBJECT=todos
+      - NATS_QUEUE_GROUP=todos

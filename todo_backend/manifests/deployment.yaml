@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: todo-backend-dep
   namespace: project
@@ -8,6 +8,12 @@ spec:
   selector:
     matchLabels:
       app: todo-backend
+  strategy:
+    canary:
+      steps:
+        - setWeight: 50
+        - pause:
+            duration: 10s
   template:
     metadata:
       labels:
@@ -16,6 +22,9 @@ spec:
       containers:
         - name: todo-backend
           image: IMAGE/BACKEND
+          envFrom:
+            - configMapRef:
+                name: nats-config
           env:
             - name: PORT
               value: "3000"

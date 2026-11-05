@@ -19,11 +19,22 @@ Every request is logged to stdout with method, path, response status and duratio
 2026-10-22T07:38:48.639Z POST /todos 201 0.6ms
 ```
 
+## Events
+
+Creating and completing a todo publishes a JSON message to the NATS subject `NATS_SUBJECT`, after the todo is saved:
+
+```json
+{ "id": "7b38f437-6501-45ff-8748-c5c8d5d63cf4", "text": "test", "action": "created" }
+```
+
+`action` is `created` (`POST /todos`) or `done` (`PUT /todos/:id`). A failed publish is logged and does not fail the request. The server keeps retrying the first NATS connection on startup. [todo_broadcaster](../todo_broadcaster) subscribes to the subject.
+
 Code layout (`src`):
 
 - `api/`: HTTP route handlers and request logging
 - `services/`: business logic (validation)
 - `repositories/`: storage (todos in Postgres)
+- `events/`: publishing todo events (NATS)
 - `db.ts`: database connection
 - `migrations.ts`: schema migrations
 
@@ -50,6 +61,8 @@ All configuration comes from environment variables. Only `POSTGRES_PORT` has a d
 | `POSTGRES_DB` | yes | Database name |
 | `POSTGRES_USER` | yes | Database user |
 | `POSTGRES_PASSWORD` | yes | Database password |
+| `NATS_URL` | yes | NATS server, e.g. `nats://localhost:4222` |
+| `NATS_SUBJECT` | yes | Subject the todo events are published to |
 
 In the cluster the variables are set in [manifests/deployment.yaml](manifests/deployment.yaml). `POSTGRES_USER` comes from the `infra-config` ConfigMap and `POSTGRES_PASSWORD` from the `infra-secrets` Secret in [infra](../infra).
 

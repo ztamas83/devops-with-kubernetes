@@ -2,6 +2,7 @@ import { logged, withLogging } from "./api/requestLogger";
 import { healthRoutes } from "./api/healthRoutes";
 import { todoRoutes } from "./api/todoRoutes";
 import { createPostgresTodoRepository } from "./repositories/todoRepository";
+import { createNatsTodoEventPublisher } from "./events/natsTodoEventPublisher";
 import { createTodoService } from "./services/todoService";
 import { config } from "./config";
 import { isDatabaseReachable, sql, waitForDatabase } from "./db";
@@ -9,12 +10,14 @@ import { runMigrations } from "./migrations";
 
 await waitForDatabase();
 await runMigrations(sql);
-const todoService = createTodoService(createPostgresTodoRepository(sql));
+const events = await createNatsTodoEventPublisher(config.nats.url, config.nats.subject);
+const todoService = createTodoService(createPostgresTodoRepository(sql), events);
 
 function shutdown(signal: string) {
   console.log(`Received ${signal}, shutting down`);
   server
     .stop()
+    .then(() => events.close())
     .then(() => sql.close())
     .then(() => process.exit(0));
 }

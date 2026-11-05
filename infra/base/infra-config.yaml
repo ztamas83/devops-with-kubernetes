@@ -4,3 +4,4 @@ metadata:
   name: infra-config
 data:
   POSTGRES_USER: postgres
+  NATS_URL: nats://my-nats.nats:4222
