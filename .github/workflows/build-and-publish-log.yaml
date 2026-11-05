@@ -1,4 +1,4 @@
-name: Build and publish application
+name: Build and publish LOG application
 
 on:
   push:
@@ -18,8 +18,9 @@ env:
 
 jobs:
   build-publish:
-    name: Build, Push, Release
+    name: Build, Push, Release LOG app
     runs-on: ubuntu-latest
+    environment: GKE_PROJECT
 
     steps:
       - name: Checkout
