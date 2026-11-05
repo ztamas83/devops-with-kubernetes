@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../log_service
+  - ../ping_pong
+images:
+  - name: IMAGE/LOG
+    newName: ztamas/log-app:4.1.1
+  - name: IMAGE/PING_PONG
+    newName: ztamas/ping-pong:4.1.1
