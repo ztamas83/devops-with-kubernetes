@@ -8,6 +8,8 @@ on:
     paths-ignore:
       - ".github/workflows/remove_branch.yaml"
       - "k8s_log/**"
+      - "log_service/**"
+      - "ping_pong/**"
   workflow_dispatch:
 
 permissions:
