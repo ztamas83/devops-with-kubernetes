@@ -22,6 +22,12 @@ resource "google_project_iam_member" "monitoring-viewer" {
   member  = google_service_account.cluster-sa.member
 }
 
+resource "google_project_iam_member" "artifacts-reader" {
+  project = var.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = google_service_account.cluster-sa.member
+}
+
 
 resource "google_storage_bucket" "backup-bucket" {
   project = var.project_id
