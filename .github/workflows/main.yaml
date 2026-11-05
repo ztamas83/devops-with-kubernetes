@@ -4,9 +4,10 @@ on:
   push:
     # Only branch pushes; tag pushes (exercise releases) are excluded
     branches:
-      - '**'
+      - "**"
     paths-ignore:
       - ".github/workflows/remove_branch.yaml"
+      - "k8s_log/**"
   workflow_dispatch:
 
 permissions:
