@@ -1,10 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../log_service
-  - ../ping_pong
+- ../log_service
+- ../ping_pong
 images:
-  - name: IMAGE/LOG
-    newName: ztamas/log-app:4.1.1
-  - name: IMAGE/PING_PONG
-    newName: ztamas/ping-pong:4.1.1
+- name: IMAGE/LOG
+  newName: europe-north2-docker.pkg.dev/k8s-course-512506/dwk-repo/log-app
+  newTag: master-7e7316c2f77afb3c6487764b667e61b4243e89ca
+- name: IMAGE/PING_PONG
+  newName: europe-north2-docker.pkg.dev/k8s-course-512506/dwk-repo/ping-pong
+  newTag: master-7e7316c2f77afb3c6487764b667e61b4243e89ca
