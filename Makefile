@@ -32,8 +32,8 @@ EXERCISE_NAMESPACE := exercises
 
 # Cluster add-ons installed by bootstrap. Argo Rollouts runs a master build for the
 # Google Managed Prometheus authentication in AnalysisTemplates, pinned to a commit and image digest
-ARGO_ROLLOUTS_REF   := 1798597f6ac230dbb6efcfa51c57cbd51d2f5031
-ARGO_ROLLOUTS_IMAGE := quay.io/argoproj/argo-rollouts@sha256:a34b3afbfa32258b736a92d63b654bdee35c8aae43e70e00e23fa05e4c150f6f
+ARGO_ROLLOUTS_REF   := c2c88ae64273e420cb5c01d92ee4bb71d3ae716a
+ARGO_ROLLOUTS_IMAGE := quay.io/argoproj/argo-rollouts@sha256:894ee9f4bf2e9f7496fe63d3835409f71c6600a5401371fcf66b4e5f309b940a
 NATS_CHART_VERSION  := 2.15.2
 NATS_PODMONITORING  := infra/monitoring/nats-podmonitoring.yaml
 

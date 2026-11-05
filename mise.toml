@@ -4,3 +4,4 @@ node = "24"
 
 [env]
 SOPS_AGE_KEY_FILE = "{{env.HOME}}/.config/age/key.txt"
+CLOUDSDK_CORE_PROJECT = "k8s-course-512506"
